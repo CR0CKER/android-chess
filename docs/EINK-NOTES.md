@@ -1,6 +1,6 @@
 # E-ink fork — engineering notes
 
-Last updated: 2026-08-03 04:41 PM CDT
+Last updated: 2026-08-03 05:03 PM CDT
 
 Working notes for the `eink` branch of `CR0CKER/android-chess`, a fork of
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess) (MIT) adapted for
@@ -134,8 +134,18 @@ Each of these cost at least one build cycle.
 - **`android:switchPadding` is silently ignored.** `SwitchMaterial` extends `SwitchCompat`,
   which reads `switchPadding` from its *own* styleable. Use the unprefixed attribute.
 - **`android:layout_*` in a style only applies through an explicit `style=`**, never
-  through `defStyleAttr` (`materialButtonStyle`). Removing a `style=` therefore drops
-  height and margin, which must then be inlined.
+  through `defStyleAttr` (`materialButtonStyle`). This cuts both ways and caught us in
+  each direction:
+  - *Removing* a `style=` drops the height and margin the style used to supply, so they
+    have to be inlined on the tag.
+  - *Adding* a `style=` to a widget that previously used `defStyleAttr` **activates**
+    layout items that were until then inert. Giving `MaterialButtonToggleGroup` children
+    an explicit style pointed them at `ChessButton`, whose `layout_margin="4dip"` then
+    applied for the first time: the children gained margins, separated, and the group
+    stopped merging their corners because they were no longer flush.
+
+  A style intended for use via `style=` should therefore declare no `layout_*` items at
+  all — which is why `ChessToggleButton` exists as a copy of `ChessButton` without them.
 - **`--` is illegal inside an XML comment** and fails the resource merger.
 - **R classes are non-transitive** (AGP default), so library attributes such as
   `colorPrimary` are absent from the app's compile-time `R` even though they exist in the
