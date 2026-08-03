@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Background for the informational panes (engine evaluation, move history,
+        last move, ECO, game rows). A theme attribute rather than a direct colour
+        reference so e-ink mode can swap the translucent tint for an outline.
+    -->
+    <attr name="paneBackground" format="reference|color" />
+</resources>

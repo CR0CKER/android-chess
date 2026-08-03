@@ -48,7 +48,7 @@
                     android:id="@+id/TextViewEngineValue"
                     android:layout_width="40dip"
                     android:layout_height="40dip"
-                    android:background="@color/paneBackgroundColor"
+                    android:background="?attr/paneBackground"
                     android:gravity="center"
                     android:accessibilityLiveRegion="none" />
 
@@ -98,7 +98,7 @@
                     android:orientation="horizontal"
                     android:scrollbars="horizontal"
                     android:fadeScrollbars="false"
-                    android:background="@color/paneBackgroundColor"
+                    android:background="?attr/paneBackground"
                     android:scrollbarAlwaysDrawHorizontalTrack="true" />
 
                 <com.google.android.material.button.MaterialButton
