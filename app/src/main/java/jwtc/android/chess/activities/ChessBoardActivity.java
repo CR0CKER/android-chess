@@ -436,9 +436,7 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
             textViewBlackPieces.setVisibility(visibilityPiecesDescriptions);
         }
 
-        // With dragging disabled, the destination dots are the only cue for where
-        // a selected piece may go, so they are not optional on e-ink.
-        showMoves = prefs.getBoolean("showMoves", false) || EinkMode.isEnabled();
+        showMoves = prefs.getBoolean("showMoves", false);
         hapticFeedback.setEnabled(prefs.getBoolean("useHapticFeedback", false));
     }
 
