@@ -20,12 +20,13 @@ import jwtc.android.chess.R;
 import jwtc.android.chess.constants.ColorSchemes;
 import jwtc.android.chess.constants.PieceSets;
 import jwtc.android.chess.helpers.ActivityHelper;
+import jwtc.android.chess.helpers.EinkMode;
 import jwtc.android.chess.services.GameApi;
 import jwtc.android.chess.views.FixedDropdownView;
 
 public class BoardPreferencesActivity extends ChessBoardActivity {
     private static final String TAG = "BoardPreferences";
-    private CheckBox checkBoxCoordinates, checkBoxShowMoves, checkBoxUsePieceAnimation, checkBoxShowCapturedPieces, checkBoxWakeLock, checkBoxFullscreen, checkBoxSound, checkBoxHapticFeedback, checkBoxNightMode;
+    private CheckBox checkBoxCoordinates, checkBoxShowMoves, checkBoxUsePieceAnimation, checkBoxShowCapturedPieces, checkBoxWakeLock, checkBoxFullscreen, checkBoxSound, checkBoxHapticFeedback, checkBoxNightMode, checkBoxEinkMode;
     private Slider sliderSaturation;
     private FixedDropdownView dropDownPieces, dropDownColorScheme, dropDownTileSet;
     private LinearLayout customColorControls;
@@ -51,6 +52,7 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         checkBoxSound = findViewById(R.id.CheckBoxUseSound);
         checkBoxHapticFeedback = findViewById(R.id.CheckBoxUseHapticFeedback);
         checkBoxNightMode = findViewById(R.id.CheckBoxForceNightMode);
+        checkBoxEinkMode = findViewById(R.id.CheckBoxEinkMode);
         sliderSaturation = findViewById(R.id.SliderSaturation);
         customColorControls = findViewById(R.id.CustomColorControls);
         buttonCustomDarkColor = findViewById(R.id.ButtonCustomDarkColor);
@@ -59,6 +61,7 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         dropDownPieces.setItems(getResources().getStringArray(R.array.piecesetarray));
         dropDownPieces.setOnItemClickListener((parent, view, position, id) -> {
             PieceSets.selectedSet = position;
+            EinkMode.applyBoardAppearance();
             rebuildBoard();
         });
 
@@ -66,6 +69,7 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         dropDownColorScheme.setOnItemClickListener((parent, view, position, id) -> {
             ColorSchemes.selectedColorScheme = position;
             updateCustomColorControls();
+            EinkMode.applyBoardAppearance();
             chessBoardView.invalidateSquares();
         });
 
@@ -77,6 +81,7 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         dropDownTileSet.setItems(getResources().getStringArray(R.array.tileArray));
         dropDownTileSet.setOnItemClickListener((parent, view, position, id) -> {
             ColorSchemes.selectedPattern = position;
+            EinkMode.applyBoardAppearance();
             chessBoardView.invalidateSquares();
         });
 
@@ -85,8 +90,24 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
             chessBoardView.invalidateSquares();
         });
 
+        checkBoxEinkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            EinkMode.setEnabled(isChecked);
+            if (isChecked) {
+                EinkMode.applyBoardAppearance();
+            } else {
+                // Restore whatever the dropdowns and slider currently show.
+                PieceSets.selectedSet = dropDownPieces.getSelectedItemPosition();
+                ColorSchemes.selectedColorScheme = dropDownColorScheme.getSelectedItemPosition();
+                ColorSchemes.selectedPattern = dropDownTileSet.getSelectedItemPosition();
+                ColorSchemes.saturationFactor = sliderSaturation.getValue();
+            }
+            setAppearanceControlsEnabled(!isChecked);
+            rebuildBoard();
+        });
+
         sliderSaturation.addOnChangeListener((s, value, fromUser) -> {
             ColorSchemes.saturationFactor = value;
+            EinkMode.applyBoardAppearance();
             chessBoardView.invalidateSquares();
         });
 
@@ -117,7 +138,10 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         checkBoxSound.setChecked(prefs.getBoolean("moveSounds", false));
         checkBoxHapticFeedback.setChecked(prefs.getBoolean("useHapticFeedback", false));
         checkBoxNightMode.setChecked(prefs.getBoolean("nightMode", false));
+        checkBoxEinkMode.setChecked(EinkMode.isEnabled());
 
+        // Show the user's own choices even while e-ink mode overrides them, so
+        // they are still there to come back to.
         dropDownPieces.setSelection(Integer.parseInt(prefs.getString("pieceset", "0")));
         dropDownColorScheme.setSelection(Integer.parseInt(prefs.getString("colorscheme", "0")));
         dropDownTileSet.setSelection(Integer.parseInt(prefs.getString("squarePattern", "0")));
@@ -125,7 +149,16 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         sliderSaturation.setValue(prefs.getFloat("squareSaturation", 1.0f));
 
         updateCustomColorControls();
+        setAppearanceControlsEnabled(!EinkMode.isEnabled());
+
         rebuildBoard();
+    }
+
+    private void setAppearanceControlsEnabled(boolean enabled) {
+        dropDownPieces.setEnabled(enabled);
+        dropDownColorScheme.setEnabled(enabled);
+        dropDownTileSet.setEnabled(enabled);
+        sliderSaturation.setEnabled(enabled);
     }
 
     @Override
@@ -148,6 +181,7 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         editor.putBoolean("moveSounds", checkBoxSound.isChecked());
         editor.putBoolean("useHapticFeedback", checkBoxHapticFeedback.isChecked());
         editor.putBoolean("nightMode", checkBoxNightMode.isChecked());
+        editor.putBoolean(EinkMode.PREF_KEY, checkBoxEinkMode.isChecked());
         editor.putFloat("squareSaturation", sliderSaturation.getValue());
         editor.putInt("customDarkSquareColor", ColorSchemes.getCustomDarkColor());
         editor.putInt("customLightSquareColor", ColorSchemes.getCustomLightColor());
