@@ -38,11 +38,11 @@ public class EinkDiagnostics {
             sb.append("einkMode=").append(EinkMode.isEnabled()).append('\n');
 
             appendThemeColor(activity, sb, "colorPrimary",
-                com.google.android.material.R.attr.colorPrimary);
+                jwtc.android.chess.R.attr.colorPrimary);
             appendThemeColor(activity, sb, "colorSurface",
-                com.google.android.material.R.attr.colorSurface);
+                jwtc.android.chess.R.attr.colorSurface);
             appendThemeColor(activity, sb, "colorOnSurface",
-                com.google.android.material.R.attr.colorOnSurface);
+                jwtc.android.chess.R.attr.colorOnSurface);
 
             appendButton(sb, "BROKEN(text)", broken);
             appendButton(sb, "WORKING(icon)", working);
