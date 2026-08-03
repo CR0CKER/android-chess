@@ -61,12 +61,19 @@
         overriding only geometry, removes the difference rather than trying to
         reproduce it. The underlying mechanism is still not understood.
     -->
-    <style name="ChessButtonEink" parent="ChessImageButtonEink">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:minWidth">72dp</item>
-        <item name="minWidth">72dp</item>
+    <style name="ChessButtonEink" parent="Widget.Material3.Button.OutlinedButton.Icon">
+        <item name="enforceMaterialTheme">true</item>
+        <item name="enforceTextAppearance">false</item>
+        <item name="android:textColor">@color/eink_button_foreground</item>
+        <item name="iconTint">@color/eink_button_foreground</item>
+        <item name="backgroundTint">@color/eink_button_background</item>
+        <item name="strokeColor">@color/einkForeground</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="elevation">0dp</item>
+        <item name="android:layout_height">@dimen/imageButtonSize</item>
+        <item name="android:layout_margin">4dip</item>
     </style>
 
     <style name="ChessImageButton" parent="Widget.Material3.Button.Icon">
