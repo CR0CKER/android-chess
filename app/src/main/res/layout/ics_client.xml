@@ -24,7 +24,7 @@
                     android:id="@+id/ButtonMenu"
                     android:text="@string/button_close"
                     android:layout_width="wrap_content"
-                    style="@style/ChessButton" />
+                    style="?attr/chessButtonStyle" />
 
                 <TextView
                     android:id="@+id/TextViewTitle"

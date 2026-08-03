@@ -10,8 +10,31 @@
         <item name="android:layout_margin">4dip</item>
     </style>
 
-    <!-- Flat, unanimated button for e-ink: no ripple, no press elevation. -->
+    <!--
+        E-ink buttons: white fill, black 1dp outline, black text and icons, and
+        nothing that animates. A filled button is a large solid block on a
+        reflective panel, which both swamps the glyph and leaves a big ghosting
+        area on press.
+    -->
     <style name="ChessButtonEink" parent="ChessButton">
+        <item name="android:textColor">@color/einkForeground</item>
+        <item name="android:tint">@color/einkForeground</item>
+        <item name="iconTint">@color/einkForeground</item>
+        <item name="android:backgroundTint">@color/eink_button_background</item>
+        <item name="strokeColor">@color/einkForeground</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="ChessImageButtonEink" parent="ChessImageButton">
+        <item name="android:textColor">@color/einkForeground</item>
+        <item name="android:tint">@color/einkForeground</item>
+        <item name="iconTint">@color/einkForeground</item>
+        <item name="android:backgroundTint">@color/eink_button_background</item>
+        <item name="strokeColor">@color/einkForeground</item>
+        <item name="strokeWidth">1dp</item>
         <item name="rippleColor">@android:color/transparent</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="elevation">0dp</item>

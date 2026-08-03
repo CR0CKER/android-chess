@@ -19,6 +19,7 @@ import jwtc.android.chess.R;
 import jwtc.android.chess.engine.EngineApi;
 import jwtc.android.chess.engine.oex.OexEngineDescriptor;
 import jwtc.android.chess.engine.oex.OexEngineResolver;
+import jwtc.android.chess.helpers.EinkMode;
 import jwtc.android.chess.helpers.ResultDialog;
 import jwtc.android.chess.helpers.ResultDialogListener;
 import jwtc.android.chess.views.FixedDropdownView;
@@ -44,10 +45,13 @@ public class GameSettingsDialog extends ResultDialog {
         final FixedDropdownView spinnerLevelTime = findViewById(R.id.SpinnerOptionsLevelTime);
         final FixedDropdownView spinnerLevelPly = findViewById(R.id.SpinnerOptionsLevelPly);
         final SwitchMaterial toggleQuiescent = findViewById(R.id.ToggleQuiescent);
+        final SwitchMaterial toggleEinkMode = findViewById(R.id.ToggleEinkMode);
         final TextView textEngineBackendHint = findViewById(R.id.TextViewEngineBackendHint);
 
         spinnerLevelTime.setItems(context.getResources().getStringArray(R.array.levels_time));
         spinnerLevelPly.setItems(context.getResources().getStringArray(R.array.levels_ply));
+
+        toggleEinkMode.setChecked(EinkMode.isEnabled());
 
         toggleQuiescent.setChecked(quiescentSearchOn);
         toggleQuiescent.setText(quiescentSearchOn
@@ -154,6 +158,7 @@ public class GameSettingsDialog extends ResultDialog {
                 editor.putInt("levelPly", spinnerLevelPly.getSelectedItemPosition() + 1);
 
                 editor.putBoolean("quiescentSearchOn", toggleQuiescent.isChecked());
+                editor.putBoolean(EinkMode.PREF_KEY, toggleEinkMode.isChecked());
 
                 editor.commit();
 

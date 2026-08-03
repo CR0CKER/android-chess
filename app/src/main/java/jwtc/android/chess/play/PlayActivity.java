@@ -234,6 +234,11 @@ public class PlayActivity extends ChessBoardActivity implements
         textViewWhitePieces = findViewById(R.id.TextViewWhitePieces);
         textViewBlackPieces = findViewById(R.id.TextViewBlackPieces);
         textViewEngineValue = findViewById(R.id.TextViewEngineValue);
+        if (EinkMode.isEnabled()) {
+            // The evaluation is a bare number; a box around it just adds edges for
+            // the panel to render and reads as a control you can press.
+            textViewEngineValue.setBackground(null);
+        }
 
         switchBlindfold = findViewById(R.id.SwitchBlindfold);
         switchBlindfold.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -348,7 +353,9 @@ public class PlayActivity extends ChessBoardActivity implements
         flipBoard = prefs.getBoolean("flipBoard", false);
         switchFlip.setChecked(flipBoard);
         switchBlindfold.setChecked(false);
-        switchMinimal.setChecked(prefs.getBoolean("minimal", false));
+        // E-ink devices are typically small and tall; the full control stack does
+        // not fit and pushes the board around. Minimal is the sane default there.
+        switchMinimal.setChecked(prefs.getBoolean("minimal", false) || EinkMode.isEnabled());
         switchMinimal(switchMinimal.isChecked());
         applyCapturedPiecesVisibility();
 
@@ -425,7 +432,11 @@ public class PlayActivity extends ChessBoardActivity implements
         editor.putLong("clockBlackMillies", localClock.getBlackRemaining());
         editor.putLong("clockStartTime", gameApi.isEnded() ? 0 : pauseTime);
         editor.putBoolean("flipBoard", flipBoard);
-        editor.putBoolean("minimal", switchMinimal.isChecked());
+        if (!EinkMode.isEnabled()) {
+            // E-ink forces minimal on; don't write that back, or it would stay
+            // stuck on after e-ink mode is switched off again.
+            editor.putBoolean("minimal", switchMinimal.isChecked());
+        }
 
         editor.commit();
     }
@@ -729,16 +740,7 @@ public class PlayActivity extends ChessBoardActivity implements
                 Intent intent;
                 String item = data.getString("item");
 
-                if (item.equals(getString(R.string.menu_eink_mode))) {
-                    // Board settings live on the home grid only, which is a long way
-                    // from a game in progress; this is the switch people actually
-                    // want to flip back and forth while looking at the board.
-                    final boolean enable = !EinkMode.isEnabled();
-                    getPrefs().edit().putBoolean(EinkMode.PREF_KEY, enable).commit();
-                    EinkMode.setEnabled(enable);
-                    // The theme is chosen in onCreate, so it needs a fresh activity.
-                    recreate();
-                } else if (item.equals(getString(R.string.menu_game_settings))) {
+                if (item.equals(getString(R.string.menu_game_settings))) {
                     GameSettingsDialog settingsDialog = new GameSettingsDialog(
                         this,
                         this,
@@ -809,6 +811,12 @@ public class PlayActivity extends ChessBoardActivity implements
                 break;
 
             case REQUEST_GAME_SETTINGS:
+                if (getPrefs().getBoolean(EinkMode.PREF_KEY, false) != EinkMode.isEnabled()) {
+                    // The theme is chosen in onCreate, so switching needs a fresh
+                    // activity rather than just a redraw.
+                    recreate();
+                    return;
+                }
                 updateGameSettingsByPrefs();
                 updateGUI();
                 break;
