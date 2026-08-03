@@ -142,7 +142,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonCancel"
                 android:text="@string/button_cancel"
                 android:layout_width="0dp"
@@ -150,7 +150,7 @@
                 android:layout_margin="2dip"
                 style="?attr/chessButtonStyle" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonOk"
                 android:text="@string/button_ok"
                 android:layout_width="0dp"
