@@ -1,0 +1,43 @@
+name: Build debug APK
+
+# The e-ink fork is developed on an aarch64 Linux machine, for which Google
+# ships no Android SDK build-tools or NDK. Building happens here instead; the
+# APK artifact is downloaded and sideloaded onto the e-ink device.
+
+on:
+  push:
+    branches: [eink, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install NDK
+        run: |
+          NDK_VERSION=$(grep -oP 'ndkVersion\s+"\K[^"]+' app/build.gradle)
+          echo "Installing NDK $NDK_VERSION"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION"
+
+      - name: Build FOSS debug APK
+        run: ./gradlew assembleFossDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: chess-eink-debug-apk
+          path: app/build/outputs/apk/foss/debug/*.apk
+          if-no-files-found: error
