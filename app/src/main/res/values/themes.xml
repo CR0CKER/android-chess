@@ -1,7 +1,7 @@
 <resources>
 
     <style name="ChessTheme" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="chessToggleButtonStyle">@style/ChessButton</item>
+        <item name="chessToggleButtonStyle">@style/ChessToggleButton</item>
         <item name="chessImageButtonStyle">@style/ChessImageButton</item>
         <item name="paneBackground">@color/paneBackgroundColor</item>
         <item name="android:windowAnimationStyle">@null</item>
@@ -22,7 +22,7 @@
     </style>
 
     <style name="ChessStart" parent="Theme.Material3.DayNight">
-        <item name="chessToggleButtonStyle">@style/ChessButton</item>
+        <item name="chessToggleButtonStyle">@style/ChessToggleButton</item>
         <item name="chessImageButtonStyle">@style/ChessImageButton</item>
         <item name="paneBackground">@color/paneBackgroundColor</item>
         <item name="android:windowAnimationStyle">@null</item>
@@ -47,7 +47,7 @@
     </style>
 
     <style name="ChessDialogTheme" parent="Theme.Material3.DayNight.Dialog">
-        <item name="chessToggleButtonStyle">@style/ChessButton</item>
+        <item name="chessToggleButtonStyle">@style/ChessToggleButton</item>
         <item name="chessImageButtonStyle">@style/ChessImageButton</item>
         <item name="paneBackground">@color/paneBackgroundColor</item>
         <item name="android:layout_width">wrap_content</item>
