@@ -52,7 +52,7 @@
         the same items copied across. The two were byte-identical in every
         colour item and still rendered differently: image buttons and
         toggle-group children came out white with a black outline, while
-        standalone text buttons came out a black slab with black text -- a
+        standalone text buttons came out a black slab with black text — a
         combination none of the ColorStateLists can produce, so backgroundTint
         was being dropped and the filled Material background (colorPrimary,
         which is black here) was showing through.
