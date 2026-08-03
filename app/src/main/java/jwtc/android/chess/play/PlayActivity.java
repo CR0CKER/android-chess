@@ -964,7 +964,11 @@ public class PlayActivity extends ChessBoardActivity implements
         layoutEco.setVisibility(minimal ? View.GONE : View.VISIBLE);
         switchBlindfold.setVisibility(minimal ? View.GONE : View.VISIBLE);
         switchFlip.setVisibility(minimal ? View.GONE : View.VISIBLE);
-        textViewLastMove.setVisibility(minimal ? View.GONE : View.VISIBLE);
+        // INVISIBLE, not GONE: this is the stretched column of the controls row
+        // (stretchColumns="2"), so removing it collapses the row and drags the
+        // menu button in from the right edge. It costs no height either way, the
+        // row is already as tall as the buttons.
+        textViewLastMove.setVisibility(minimal ? View.INVISIBLE : View.VISIBLE);
         textViewWhitePieces.setVisibility(minimal ? View.GONE : View.VISIBLE);
         textViewBlackPieces.setVisibility(minimal ? View.GONE : View.VISIBLE);
         requestBoardLayoutSizingUpdate();

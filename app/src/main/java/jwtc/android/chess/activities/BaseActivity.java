@@ -61,8 +61,12 @@ public class BaseActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
-        if (prefs.getBoolean("fullScreen", false)) {
+        // E-ink screens are small and the status bar is a permanently redrawing
+        // strip (clock, wifi, battery) in a shade the app does not control.
+        if (prefs.getBoolean("fullScreen", false) || EinkMode.isEnabled()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
         super.onResume();
