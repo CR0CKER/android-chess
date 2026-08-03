@@ -3,7 +3,6 @@ package jwtc.android.chess.views;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +23,13 @@ public class ChessSquareView extends View {
     private static Paint paint = new Paint();
     private static Paint highlightPaint = new Paint();
     private static final String TAG = "ChessSquareView";
+
+    // Loading a Drawable allocates and inflates XML; doing that inside onDraw
+    // ran it once per square per repaint. Cached per view, and the tint is still
+    // set on every draw, so no state leaks between squares.
+    private Drawable patternDrawableCache;
+    private int patternDrawableCacheId = 0;
+    private Drawable selectDrawableCache;
 
     public ChessSquareView(Context context, int pos) {
         super(context);
@@ -100,12 +106,16 @@ public class ChessSquareView extends View {
         } else {
             paint.setColor(fieldColor == BoardConstants.WHITE ? ColorSchemes.getLight() : ColorSchemes.getDark());
         }
-        canvas.drawRect(new Rect(0, 0, getWidth(), getHeight()), paint);
+        canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
 
         int patternDrawable = ColorSchemes.getSelectedPatternDrawable();
         if (patternDrawable > 0) {
             if (fieldColor == BoardConstants.BLACK && patternDrawable == R.drawable.diagonal_stripes || patternDrawable != R.drawable.diagonal_stripes) {
-                Drawable d = getResources().getDrawable(patternDrawable, null);
+                if (patternDrawableCache == null || patternDrawableCacheId != patternDrawable) {
+                    patternDrawableCache = getResources().getDrawable(patternDrawable, null);
+                    patternDrawableCacheId = patternDrawable;
+                }
+                Drawable d = patternDrawableCache;
                 d.setTint(patternDrawable == R.drawable.diagonal_stripes ? ColorSchemes.getLight() : ColorSchemes.getSelectedColor());
                 d.setBounds(0, 0, getWidth(), getHeight());
                 d.draw(canvas);
@@ -113,7 +123,10 @@ public class ChessSquareView extends View {
         }
 
         if (focussed) {
-            Drawable d = getResources().getDrawable(R.drawable.ic_select, null);
+            if (selectDrawableCache == null) {
+                selectDrawableCache = getResources().getDrawable(R.drawable.ic_select, null);
+            }
+            Drawable d = selectDrawableCache;
             d.setBounds(0, 0, getWidth(), getHeight());
             d.draw(canvas);
         }
@@ -149,7 +162,7 @@ public class ChessSquareView extends View {
         if (highlighted) {
             highlightPaint.setStyle(Paint.Style.FILL);
             highlightPaint.setColor(ColorSchemes.getHightlightColor());
-            canvas.drawRect(new Rect(0, 0, getWidth(), getHeight()), highlightPaint);
+            canvas.drawRect(0, 0, getWidth(), getHeight(), highlightPaint);
 
         }
 
