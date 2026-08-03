@@ -110,7 +110,11 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         jni.newGame();
 
         checkBoxCoordinates.setChecked(prefs.getBoolean("showCoords", false));
-        checkBoxShowMoves.setChecked(prefs.getBoolean("showMoves", true));
+        // Must match ChessBoardActivity, which reads this with a default of false.
+        // With the two disagreeing, merely opening this screen showed the box
+        // ticked and wrote showMoves=true back on the way out, silently turning
+        // the move dots on for someone who never touched the setting.
+        checkBoxShowMoves.setChecked(prefs.getBoolean("showMoves", false));
         checkBoxShowCapturedPieces.setChecked(prefs.getBoolean("showCapturedPieces", true));
         checkBoxWakeLock.setChecked(prefs.getBoolean("wakeLock", false));
         checkBoxFullscreen.setChecked(prefs.getBoolean("fullScreen", false));

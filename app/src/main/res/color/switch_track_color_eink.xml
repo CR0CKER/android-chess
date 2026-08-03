@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Switch track for e-ink. The Material default fills the track with the
+    secondary colour when checked, which is the green bar behind the thumb.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="@color/einkSurface" />
+    <item android:color="@color/einkSurface" />
+</selector>

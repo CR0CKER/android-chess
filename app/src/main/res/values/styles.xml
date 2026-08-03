@@ -167,4 +167,12 @@
     <style name="MySwitchStyle" parent="Widget.MaterialComponents.CompoundButton.Switch">
         <item name="thumbTint">@color/switch_thumb_color</item>
     </style>
+
+    <!-- Greyscale switch: state reads from thumb position and darkness, not hue. -->
+    <style name="MySwitchStyleEink" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="thumbTint">@color/switch_thumb_color_eink</item>
+        <item name="trackTint">@color/switch_track_color_eink</item>
+        <item name="android:textColor">@color/einkForeground</item>
+        <item name="useMaterialThemeColors">false</item>
+    </style>
 </resources>

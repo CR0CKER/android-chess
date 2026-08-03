@@ -80,6 +80,7 @@
         leaves a ghost on every tap.
     -->
     <style name="ChessThemeEink" parent="ChessTheme">
+        <item name="switchStyle">@style/MySwitchStyleEink</item>
         <item name="chessButtonStyle">@style/ChessButtonEink</item>
         <item name="chessImageButtonStyle">@style/ChessImageButtonEink</item>
         <item name="paneBackground">@drawable/eink_pane_border</item>
@@ -98,6 +99,7 @@
     </style>
 
     <style name="ChessStartEink" parent="ChessStart">
+        <item name="switchStyle">@style/MySwitchStyleEink</item>
         <item name="chessButtonStyle">@style/ChessButtonEink</item>
         <item name="chessImageButtonStyle">@style/ChessImageButtonEink</item>
         <item name="paneBackground">@drawable/eink_pane_border</item>
@@ -111,6 +113,25 @@
         <item name="colorOnSurface">@color/einkForeground</item>
         <item name="colorControlHighlight">@android:color/transparent</item>
         <item name="rippleColor">@android:color/transparent</item>
+        <item name="materialButtonStyle">@style/ChessButtonEink</item>
+    </style>
+
+    <style name="ChessDialogThemeEink" parent="ChessDialogTheme">
+        <item name="paneBackground">@drawable/eink_pane_border</item>
+        <item name="chessButtonStyle">@style/ChessButtonEink</item>
+        <item name="chessImageButtonStyle">@style/ChessImageButtonEink</item>
+        <item name="android:windowBackground">@color/einkBackground</item>
+        <item name="colorPrimary">@color/einkSurface</item>
+        <item name="colorPrimaryVariant">@color/einkSurface</item>
+        <item name="colorOnPrimary">@color/einkForeground</item>
+        <item name="colorSecondary">@color/einkSurface</item>
+        <item name="colorSecondaryVariant">@color/einkSurface</item>
+        <item name="colorOnSecondary">@color/einkForeground</item>
+        <item name="colorSurface">@color/einkBackground</item>
+        <item name="colorOnSurface">@color/einkForeground</item>
+        <item name="colorControlHighlight">@android:color/transparent</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="switchStyle">@style/MySwitchStyleEink</item>
         <item name="materialButtonStyle">@style/ChessButtonEink</item>
     </style>
 

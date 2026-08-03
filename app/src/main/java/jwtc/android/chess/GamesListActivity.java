@@ -1,5 +1,6 @@
 package jwtc.android.chess;
 
+import jwtc.android.chess.helpers.EinkMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -561,7 +562,7 @@ public class GamesListActivity extends ChessBoardActivity {
 
     private class FilterDialog extends Dialog {
         public FilterDialog(@NonNull Context context) {
-            super(context, R.style.ChessDialogTheme);
+            super(context, EinkMode.isEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
 
             setContentView(R.layout.gameslist_filters);
         }
