@@ -655,14 +655,21 @@ public class PlayActivity extends ChessBoardActivity implements
         int piece, turnAt;
         for (turnAt = 0; turnAt < 2; turnAt++) {
             for (piece = 0; piece < 5; piece++) {
-                ChessSquareView square = new ChessSquareView(this, piece);
-                if (turnAt == BoardConstants.WHITE) {
-                    capturedWhitePieces.addView(square);
-                } else {
-                    capturedBlackPieces.addView(square);
+                int numCaptured = jni.getNumCaptured(turnAt, piece);
+
+                // The empty slots are placeholders painted in the board colours,
+                // which on a greyscale panel read as a row of unexplained blocks
+                // rather than as "nothing captured yet". Only show a slot once it
+                // actually holds a piece.
+                if (numCaptured > 0 || !EinkMode.isEnabled()) {
+                    ChessSquareView square = new ChessSquareView(this, piece);
+                    if (turnAt == BoardConstants.WHITE) {
+                        capturedWhitePieces.addView(square);
+                    } else {
+                        capturedBlackPieces.addView(square);
+                    }
                 }
 
-                int numCaptured = jni.getNumCaptured(turnAt, piece);
 //                Log.d(TAG, "numCaptured for " + turnAt + " " + piece + " " + numCaptured);
                 if (numCaptured > 0) {
                     ChessPieceView capturedPiece = new ChessPieceView(this, turnAt, piece, piece);
@@ -722,7 +729,16 @@ public class PlayActivity extends ChessBoardActivity implements
                 Intent intent;
                 String item = data.getString("item");
 
-                if (item.equals(getString(R.string.menu_game_settings))) {
+                if (item.equals(getString(R.string.menu_eink_mode))) {
+                    // Board settings live on the home grid only, which is a long way
+                    // from a game in progress; this is the switch people actually
+                    // want to flip back and forth while looking at the board.
+                    final boolean enable = !EinkMode.isEnabled();
+                    getPrefs().edit().putBoolean(EinkMode.PREF_KEY, enable).commit();
+                    EinkMode.setEnabled(enable);
+                    // The theme is chosen in onCreate, so it needs a fresh activity.
+                    recreate();
+                } else if (item.equals(getString(R.string.menu_game_settings))) {
                     GameSettingsDialog settingsDialog = new GameSettingsDialog(
                         this,
                         this,

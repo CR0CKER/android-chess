@@ -96,7 +96,7 @@
 
     <style name="MyPaneTextStyle" parent="@style/MySmallTextStyle">
         <item name="android:padding">4dip</item>
-        <item name="android:background">@color/paneBackgroundColor</item>
+        <item name="android:background">?attr/paneBackground</item>
         <item name="android:scrollHorizontally">false</item>
     </style>
 

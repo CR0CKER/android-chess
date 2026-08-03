@@ -7,7 +7,7 @@
     <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/paneBackgroundColor"
+        android:background="?attr/paneBackground"
         android:stretchColumns="1"
         android:layout_marginBottom="1dip"
         android:padding="8dip">
