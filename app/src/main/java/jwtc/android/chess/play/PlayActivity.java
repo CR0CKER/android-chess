@@ -810,13 +810,13 @@ public class PlayActivity extends ChessBoardActivity implements
         // change once a second, so half of these were redundant redraws of a
         // fixed-size text box. Cheap everywhere, and on e-ink it halves the
         // number of panel updates the clock costs.
-        final String white = localClock.getWhiteRemainingTime();
-        final String black = localClock.getBlackRemainingTime();
-        if (!white.contentEquals(textViewWhiteClockTIme.getText())) {
-            textViewWhiteClockTIme.setText(white);
+        final String whiteTime = localClock.getWhiteRemainingTime();
+        final String blackTime = localClock.getBlackRemainingTime();
+        if (!whiteTime.contentEquals(textViewWhiteClockTIme.getText())) {
+            textViewWhiteClockTIme.setText(whiteTime);
         }
-        if (!black.contentEquals(textViewBlackClockTime.getText())) {
-            textViewBlackClockTime.setText(black);
+        if (!blackTime.contentEquals(textViewBlackClockTime.getText())) {
+            textViewBlackClockTime.setText(blackTime);
         }
 
         if (localClock.isClockConfigured()) {
