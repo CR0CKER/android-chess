@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    E-ink buttons are white with a black outline. A selected toggle (or a pressed
-    button) fills with the same grey as the dark board square, so "active" looks
-    the same everywhere in the app.
+    Button fill: white normally, black when selected or pressed. Pure black and
+    white only, no intermediate greys, so every state survives a 1-bit render.
+    Pair with eink_button_foreground, which inverts to match.
 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/einkSurface" android:state_enabled="false" />
-    <item android:color="@color/einkBoardDark" android:state_checked="true" />
-    <item android:color="@color/einkBoardDark" android:state_pressed="true" />
+    <item android:color="@color/einkBackground" android:state_enabled="false" />
+    <item android:color="@color/einkForeground" android:state_checked="true" />
+    <item android:color="@color/einkForeground" android:state_pressed="true" />
     <item android:color="@color/einkBackground" />
 </selector>

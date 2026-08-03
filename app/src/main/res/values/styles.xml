@@ -11,33 +11,57 @@
     </style>
 
     <!--
-        E-ink buttons: white fill, black 1dp outline, black text and icons, and
-        nothing that animates. A filled button is a large solid block on a
-        reflective panel, which both swamps the glyph and leaves a big ghosting
-        area on press.
+        E-ink buttons are outlined, not filled: white (or black when selected)
+        with a black 1dp stroke and no animation.
+
+        The parent is deliberately the OutlinedButton variant. The filled variant
+        paints a solid background from the theme before any tint is applied, which
+        is what produced black-on-black labels; outlined starts transparent, so
+        the worst case is an invisible fill rather than an unreadable one.
     -->
-    <style name="ChessButtonEink" parent="ChessButton">
-        <item name="android:textColor">@color/einkForeground</item>
-        <item name="android:tint">@color/einkForeground</item>
-        <item name="iconTint">@color/einkForeground</item>
+    <style name="ChessButtonEink" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/eink_button_foreground</item>
+        <item name="android:tint">@color/eink_button_foreground</item>
+        <item name="iconTint">@color/eink_button_foreground</item>
+        <item name="backgroundTint">@color/eink_button_background</item>
         <item name="android:backgroundTint">@color/eink_button_background</item>
         <item name="strokeColor">@color/einkForeground</item>
         <item name="strokeWidth">1dp</item>
         <item name="rippleColor">@android:color/transparent</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="elevation">0dp</item>
+        <item name="android:layout_height">@dimen/imageButtonSize</item>
+        <item name="android:layout_margin">4dip</item>
     </style>
 
-    <style name="ChessImageButtonEink" parent="ChessImageButton">
-        <item name="android:textColor">@color/einkForeground</item>
-        <item name="android:tint">@color/einkForeground</item>
-        <item name="iconTint">@color/einkForeground</item>
+    <style name="ChessImageButtonEink" parent="Widget.Material3.Button.OutlinedButton.Icon">
+        <item name="enforceMaterialTheme">true</item>
+        <item name="enforceTextAppearance">false</item>
+        <item name="android:textColor">@color/eink_button_foreground</item>
+        <item name="android:tint">@color/eink_button_foreground</item>
+        <item name="iconTint">@color/eink_button_foreground</item>
+        <item name="backgroundTint">@color/eink_button_background</item>
         <item name="android:backgroundTint">@color/eink_button_background</item>
         <item name="strokeColor">@color/einkForeground</item>
         <item name="strokeWidth">1dp</item>
         <item name="rippleColor">@android:color/transparent</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="elevation">0dp</item>
+        <item name="android:layout_width">@dimen/imageButtonSize</item>
+        <item name="android:layout_height">@dimen/imageButtonSize</item>
+        <item name="android:padding">0dip</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="minWidth">0dp</item>
+        <item name="minHeight">0dp</item>
+        <item name="ensureMinTouchTargetSize">false</item>
+        <item name="android:layout_margin">4dip</item>
     </style>
 
     <style name="ChessImageButton" parent="Widget.Material3.Button.Icon">
@@ -169,9 +193,16 @@
     </style>
 
     <!-- Greyscale switch: state reads from thumb position and darkness, not hue. -->
+    <!--
+        Outlined monochrome switch. Tints are cleared and explicit track/thumb
+        drawables supplied, because a tint can only fill a shape, and a grey fill
+        is exactly what we are trying to avoid.
+    -->
     <style name="MySwitchStyleEink" parent="Widget.MaterialComponents.CompoundButton.Switch">
-        <item name="thumbTint">@color/switch_thumb_color_eink</item>
-        <item name="trackTint">@color/switch_track_color_eink</item>
+        <item name="thumbTint">@null</item>
+        <item name="trackTint">@null</item>
+        <item name="android:thumb">@drawable/eink_switch_thumb</item>
+        <item name="track">@drawable/eink_switch_track</item>
         <item name="android:textColor">@color/einkForeground</item>
         <item name="useMaterialThemeColors">false</item>
     </style>
