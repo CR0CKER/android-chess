@@ -12,6 +12,7 @@ import jwtc.chess.board.BoardConstants;
 
 public class ChessPieceLabelView extends AppCompatTextView {
     private final int position;
+    private int appliedTextSize = -1;
     public static final String MATE_LOSER = "#";
     public static final String MATE_WINNER = "\uD83D\uDF32";
     public static final String FLAG = "⚑";
@@ -55,7 +56,16 @@ public class ChessPieceLabelView extends AppCompatTextView {
 
     public void onDraw(Canvas canvas) {
         int textSize = 3 * getHeight() / 4;
-        setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize >= 8 ? textSize : 8);
+        if (textSize < 8) {
+            textSize = 8;
+        }
+        // setTextSize requests a layout and invalidates when the value changes,
+        // so calling it unconditionally from onDraw scheduled another draw on
+        // every draw. Only apply it when it actually differs.
+        if (appliedTextSize != textSize) {
+            appliedTextSize = textSize;
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        }
 
         super.onDraw(canvas);
     }
