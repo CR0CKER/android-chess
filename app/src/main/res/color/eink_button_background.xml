@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    E-ink buttons are white-filled with a black outline (see ChessButtonEink /
+    ChessImageButtonEink). The filled Material style would put a solid mid-grey
+    slab behind every icon, which costs contrast against the icon itself and
+    leaves a large ghosting area on every press.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/einkSurface" android:state_enabled="false" />
+    <item android:color="@color/einkSurface" android:state_checked="true" />
+    <item android:color="@color/einkSurface" android:state_pressed="true" />
+    <item android:color="@color/einkBackground" />
+</selector>

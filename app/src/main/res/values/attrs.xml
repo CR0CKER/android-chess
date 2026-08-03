@@ -6,4 +6,12 @@
         reference so e-ink mode can swap the translucent tint for an outline.
     -->
     <attr name="paneBackground" format="reference|color" />
+
+    <!--
+        Button styles as theme attributes. The layouts reference these instead of
+        a concrete style so e-ink mode can swap in flat, outlined variants without
+        touching every layout.
+    -->
+    <attr name="chessButtonStyle" format="reference" />
+    <attr name="chessImageButtonStyle" format="reference" />
 </resources>

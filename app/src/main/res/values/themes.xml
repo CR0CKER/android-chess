@@ -1,6 +1,8 @@
 <resources>
 
     <style name="ChessTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="chessButtonStyle">@style/ChessButton</item>
+        <item name="chessImageButtonStyle">@style/ChessImageButton</item>
         <item name="paneBackground">@color/paneBackgroundColor</item>
         <item name="android:windowAnimationStyle">@null</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
@@ -20,6 +22,8 @@
     </style>
 
     <style name="ChessStart" parent="Theme.Material3.DayNight">
+        <item name="chessButtonStyle">@style/ChessButton</item>
+        <item name="chessImageButtonStyle">@style/ChessImageButton</item>
         <item name="paneBackground">@color/paneBackgroundColor</item>
         <item name="android:windowAnimationStyle">@null</item>
         <item name="colorPrimary">@color/primaryColor</item>
@@ -43,6 +47,8 @@
     </style>
 
     <style name="ChessDialogTheme" parent="Theme.Material3.DayNight.Dialog">
+        <item name="chessButtonStyle">@style/ChessButton</item>
+        <item name="chessImageButtonStyle">@style/ChessImageButton</item>
         <item name="paneBackground">@color/paneBackgroundColor</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -74,6 +80,8 @@
         leaves a ghost on every tap.
     -->
     <style name="ChessThemeEink" parent="ChessTheme">
+        <item name="chessButtonStyle">@style/ChessButtonEink</item>
+        <item name="chessImageButtonStyle">@style/ChessImageButtonEink</item>
         <item name="paneBackground">@drawable/eink_pane_border</item>
         <item name="android:windowBackground">@color/einkBackground</item>
         <item name="colorPrimary">@color/einkSurface</item>
@@ -90,6 +98,8 @@
     </style>
 
     <style name="ChessStartEink" parent="ChessStart">
+        <item name="chessButtonStyle">@style/ChessButtonEink</item>
+        <item name="chessImageButtonStyle">@style/ChessImageButtonEink</item>
         <item name="paneBackground">@drawable/eink_pane_border</item>
         <item name="colorPrimary">@color/einkSurface</item>
         <item name="colorPrimaryVariant">@color/einkSurface</item>
