@@ -11,6 +11,20 @@
     </style>
 
     <!--
+        Toggle group children, colour mode. Identical to ChessButton minus the
+        layout_height and layout_margin items: those are inert when a style
+        arrives through materialButtonStyle, but a toggle child references this
+        with an explicit style=, which activates them and pushes the children
+        apart instead of leaving them flush.
+    -->
+    <style name="ChessToggleButton" parent="Widget.Material3.Button">
+        <item name="android:textColor">@color/surfaceTextColor</item>
+        <item name="android:tint">@color/primaryTextColor</item>
+        <item name="android:backgroundTint">@color/imagebutton_background</item>
+        <item name="rippleColor">@color/secondaryVariantColor</item>
+    </style>
+
+    <!--
         E-ink buttons: white fill, black outline, black text/icons, nothing that
         animates. A filled button is a solid block on a reflective panel that
         swamps the glyph and leaves a large ghosting area on press.
