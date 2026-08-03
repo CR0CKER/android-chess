@@ -71,18 +71,18 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         });
 
         checkBoxEinkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            EinkMode.setEnabled(isChecked);
-            if (isChecked) {
-                EinkMode.applyBoardAppearance();
-            } else {
-                // Restore whatever the dropdowns and slider currently show.
-                PieceSets.selectedSet = dropDownPieces.getSelectedItemPosition();
-                ColorSchemes.selectedColorScheme = dropDownColorScheme.getSelectedItemPosition();
-                ColorSchemes.selectedPattern = dropDownTileSet.getSelectedItemPosition();
-                ColorSchemes.saturationFactor = sliderSaturation.getValue();
+            if (!buttonView.isPressed() || isChecked == EinkMode.isEnabled()) {
+                // Fired by setChecked while restoring state, not by the user.
+                return;
             }
-            setAppearanceControlsEnabled(!isChecked);
-            rebuildBoard();
+            EinkMode.setEnabled(isChecked);
+            // Persist before recreating: the new instance reads the preference in
+            // onCreate to pick its theme, and this activity's onPause would
+            // otherwise be the only thing that writes it.
+            getPrefs().edit().putBoolean(EinkMode.PREF_KEY, isChecked).commit();
+            // The theme decides the button, switch and pane styling and is chosen
+            // in onCreate, so this screen has to come back up to restyle itself.
+            recreate();
         });
 
         sliderSaturation.addOnChangeListener((s, value, fromUser) -> {

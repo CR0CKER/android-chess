@@ -43,9 +43,17 @@ public class StartBaseActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         SharedPreferences prefs = getSharedPreferences("ChessPlayer", Context.MODE_PRIVATE);
+
+        // Before super.onCreate: AppCompat resolves theme attributes while
+        // building its delegate, so a later setTheme leaves widgets styled from
+        // the previous theme after a recreate().
+        EinkMode.load(prefs);
+        if (EinkMode.isEnabled()) {
+            setTheme(R.style.ChessStartEink);
+        }
+
+        super.onCreate(savedInstanceState);
 
         Resources resources = getResources();
         Configuration configuration = resources.getConfiguration();
@@ -55,11 +63,6 @@ public class StartBaseActivity extends AppCompatActivity {
             getApplicationContext().createConfigurationContext(configuration);
         } else {
             resources.updateConfiguration(configuration, displayMetrics);
-        }
-
-        EinkMode.load(prefs);
-        if (EinkMode.isEnabled()) {
-            setTheme(R.style.ChessStartEink);
         }
 
         if (prefs.getBoolean("nightMode", false)) {

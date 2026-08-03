@@ -40,14 +40,16 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Must run before the subclass calls setContentView, so the monochrome
-        // palette is in place when the layout is inflated.
+        // Before super.onCreate, not just before setContentView: AppCompat
+        // resolves theme attributes while creating its delegate, so a theme set
+        // afterwards is only partly honoured and widget styles from the previous
+        // theme survive a recreate().
         EinkMode.load(getPrefs());
         if (EinkMode.isEnabled()) {
             setTheme(R.style.ChessThemeEink);
         }
+
+        super.onCreate(savedInstanceState);
 
         this.am = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
     }
