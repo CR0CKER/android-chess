@@ -141,31 +141,41 @@
                 android:id="@+id/ButtonSetupOptionsCancel"
                 android:text="@string/button_cancel"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonSetupOptionsReset"
                 android:text="@string/msg_setup_reset"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonSetupOptionsClear"
                 android:text="@string/msg_setup_clear"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonSetupOptionsRandom"
                 android:text="@string/msg_setup_random"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonSetupOptionsOk"
                 android:text="@string/button_ok"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
         </com.google.android.flexbox.FlexboxLayout>
 
         <TextView

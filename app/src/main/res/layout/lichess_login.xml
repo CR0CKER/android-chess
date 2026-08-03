@@ -38,7 +38,9 @@
                 android:text="@string/button_login"
                 android:id="@+id/ButtonLogin"
                 android:layout_width="fill_parent"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </RelativeLayout>

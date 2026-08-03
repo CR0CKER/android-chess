@@ -40,7 +40,9 @@
                 android:id="@+id/ButtonPuzzleShow"
                 android:text="@string/puzzle_show"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonPuzzleRetry"

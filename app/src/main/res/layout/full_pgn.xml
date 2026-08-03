@@ -32,7 +32,9 @@
                 android:layout_width="wrap_content"
                 android:text="@string/button_close"
                 android:id="@+id/ButtonClose"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
         </TableRow>
     </TableLayout>
 </LinearLayout>
