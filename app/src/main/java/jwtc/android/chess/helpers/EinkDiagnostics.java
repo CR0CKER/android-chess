@@ -37,12 +37,9 @@ public class EinkDiagnostics {
             final StringBuilder sb = new StringBuilder();
             sb.append("einkMode=").append(EinkMode.isEnabled()).append('\n');
 
-            appendThemeColor(activity, sb, "colorPrimary",
-                jwtc.android.chess.R.attr.colorPrimary);
-            appendThemeColor(activity, sb, "colorSurface",
-                jwtc.android.chess.R.attr.colorSurface);
-            appendThemeColor(activity, sb, "colorOnSurface",
-                jwtc.android.chess.R.attr.colorOnSurface);
+            appendThemeColor(activity, sb, "colorPrimary");
+            appendThemeColor(activity, sb, "colorSurface");
+            appendThemeColor(activity, sb, "colorOnSurface");
 
             appendButton(sb, "BROKEN(text)", broken);
             appendButton(sb, "WORKING(icon)", working);
@@ -57,9 +54,20 @@ public class EinkDiagnostics {
         }
     }
 
-    private static void appendThemeColor(Activity activity, StringBuilder sb, String label, int attr) {
+    /**
+     * Resolved at runtime by name: R classes are non-transitive, so the library
+     * attributes are absent from the app's compile-time R even though they are
+     * present in the merged resource table.
+     */
+    private static void appendThemeColor(Activity activity, StringBuilder sb, String name) {
+        sb.append(name).append('=');
+        final int attr = activity.getResources()
+            .getIdentifier(name, "attr", activity.getPackageName());
+        if (attr == 0) {
+            sb.append("NO_SUCH_ATTR\n");
+            return;
+        }
         final TypedValue tv = new TypedValue();
-        sb.append(label).append('=');
         sb.append(activity.getTheme().resolveAttribute(attr, tv, true) ? hex(tv.data) : "UNRESOLVED");
         sb.append('\n');
     }
