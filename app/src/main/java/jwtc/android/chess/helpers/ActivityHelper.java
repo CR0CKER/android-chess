@@ -32,7 +32,9 @@ public class ActivityHelper {
             }
 
             SharedPreferences prefs = context.getSharedPreferences("ChessPlayer", Activity.MODE_PRIVATE);
-            boolean fullScreen = prefs.getBoolean("fullScreen", false);
+            // Must agree with BaseActivity, which also forces fullscreen on e-ink,
+            // or the status bar inset stays reserved as a blank strip.
+            boolean fullScreen = prefs.getBoolean("fullScreen", false) || EinkMode.isEnabled();
 
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             DisplayCutoutCompat cutout = insets.getDisplayCutout();
