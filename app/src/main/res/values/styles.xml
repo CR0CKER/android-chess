@@ -205,5 +205,12 @@
         <item name="track">@drawable/eink_switch_track</item>
         <item name="android:textColor">@color/einkForeground</item>
         <item name="useMaterialThemeColors">false</item>
+        <!--
+            The stock Material track is a nine-patch carrying its own padding, so
+            the label never touched it. A plain shape has none, which left the
+            text butted against the outline.
+        -->
+        <item name="android:switchPadding">10dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
     </style>
 </resources>

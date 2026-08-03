@@ -236,8 +236,11 @@ public class PlayActivity extends ChessBoardActivity implements
         textViewEngineValue = findViewById(R.id.TextViewEngineValue);
         if (EinkMode.isEnabled()) {
             // The evaluation is a bare number; a box around it just adds edges for
-            // the panel to render and reads as a control you can press.
+            // the panel to render and reads as a control you can press. It carries
+            // no textColor of its own, so it also has to be pinned to black rather
+            // than inheriting a mid-grey default.
             textViewEngineValue.setBackground(null);
+            textViewEngineValue.setTextColor(getResources().getColor(R.color.einkForeground, getTheme()));
         }
 
         switchBlindfold = findViewById(R.id.SwitchBlindfold);
