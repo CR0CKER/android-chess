@@ -1,8 +1,11 @@
 package jwtc.android.chess.helpers;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Locale;
 
 import jwtc.android.chess.constants.ColorSchemes;
 import jwtc.android.chess.constants.PieceSets;
@@ -26,16 +29,26 @@ public class EinkMode {
     public static final String PREF_KEY = "einkMode";
 
     /**
-     * On by default in this fork: it exists to be run on e-ink hardware, and a
-     * fresh install that comes up in the colour theme is a trap — the stock
-     * filled buttons render on greyscale as dark blocks that look like a
-     * styling bug rather than a mode that is simply switched off.
+     * Vendors whose entire product line is electrophoretic, matched against
+     * Build.MANUFACTURER / BRAND / MODEL.
      *
-     * Upstream would default this to false.
+     * Android exposes no way to ask whether a display is e-ink — there is no
+     * panel-technology API — so this is a vendor allowlist, not a property of
+     * the screen. It is deliberately conservative: mixed-line vendors such as
+     * Hisense and TCL ship both e-ink readers and ordinary LCD phones and are
+     * left out, because a false positive would hand an LCD user a greyscale
+     * board and no animations for no reason. Anything unrecognised defaults
+     * off, which is the correct answer for the overwhelming majority of
+     * devices.
      */
-    public static final boolean DEFAULT_ENABLED = true;
+    private static final String[] EINK_VENDORS = {
+        "onyx", "boox", "bigme", "dasung", "meebook", "boyue", "likebook",
+        "supernote", "ratta", "moaan", "pocketbook", "remarkable", "inkbook",
+    };
 
-    private static boolean enabled = DEFAULT_ENABLED;
+    private static Boolean einkHardware = null;
+
+    private static boolean enabled = false;
 
     public static boolean isEnabled() {
         return enabled;
@@ -46,7 +59,36 @@ public class EinkMode {
      * the other appearance preferences.
      */
     public static void load(SharedPreferences prefs) {
-        enabled = prefs.getBoolean(PREF_KEY, DEFAULT_ENABLED);
+        enabled = prefs.getBoolean(PREF_KEY, defaultEnabled());
+    }
+
+    /**
+     * Whether the mode should start on, for an install that has never been
+     * configured. An explicit choice always wins: once the preference exists,
+     * this is not consulted again.
+     */
+    public static boolean defaultEnabled() {
+        return isEinkHardware();
+    }
+
+    /**
+     * Best-effort identification of e-ink hardware by vendor. See
+     * {@link #EINK_VENDORS} for why this cannot query the display itself.
+     */
+    public static boolean isEinkHardware() {
+        if (einkHardware == null) {
+            final String fingerprint = (Build.MANUFACTURER + ' ' + Build.BRAND + ' ' + Build.MODEL)
+                .toLowerCase(Locale.ROOT);
+            boolean match = false;
+            for (String vendor : EINK_VENDORS) {
+                if (fingerprint.contains(vendor)) {
+                    match = true;
+                    break;
+                }
+            }
+            einkHardware = match;
+        }
+        return einkHardware;
     }
 
     /**
