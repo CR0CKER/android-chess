@@ -143,20 +143,20 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
+                android:layout_height="wrap_content"
                 android:id="@+id/ButtonCancel"
                 android:text="@string/button_cancel"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_margin="2dip"
-                style="?attr/chessButtonStyle" />
+                android:layout_margin="2dip" />
 
             <com.google.android.material.button.MaterialButton
+                android:layout_height="wrap_content"
                 android:id="@+id/ButtonOk"
                 android:text="@string/button_ok"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_margin="2dip"
-                style="?attr/chessButtonStyle" />
+                android:layout_margin="2dip" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -210,7 +210,12 @@
             the label never touched it. A plain shape has none, which left the
             text butted against the outline.
         -->
-        <item name="android:switchPadding">10dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
+        <!--
+            No android: prefix. SwitchMaterial extends SwitchCompat, which reads
+            switchPadding from its own styleable; the framework attribute of the
+            same name is silently ignored.
+        -->
+        <item name="switchPadding">10dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
     </style>
 </resources>
