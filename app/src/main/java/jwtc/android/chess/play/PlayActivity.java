@@ -536,8 +536,17 @@ public class PlayActivity extends ChessBoardActivity implements
 
     @Override
     public void OnEngineInfo(String message, float value) {
-        textViewEngineValue.setText(String.format("%.1f", value));
-        if (textViewInfoBalloon != null && textViewInfoBalloon.getParent() != null) {
+        // The local engine reports once a second and an external UCI engine can
+        // report many times a second, each rewriting a whole principal variation.
+        // Only touch the views when the text actually changes, and leave the
+        // balloon alone on e-ink, where a line of text rewritten mid-search is a
+        // steady stream of panel updates for information that is obsolete by the
+        // time it has finished rendering.
+        final String scoreText = String.format("%.1f", value);
+        if (!scoreText.contentEquals(textViewEngineValue.getText())) {
+            textViewEngineValue.setText(scoreText);
+        }
+        if (!EinkMode.isEnabled() && textViewInfoBalloon != null && textViewInfoBalloon.getParent() != null) {
             textViewInfoBalloon.setText(message);
         }
     }
@@ -797,8 +806,18 @@ public class PlayActivity extends ChessBoardActivity implements
 
     @Override
     public void OnClockTime() {
-        textViewWhiteClockTIme.setText(localClock.getWhiteRemainingTime());
-        textViewBlackClockTime.setText(localClock.getBlackRemainingTime());
+        // The clock thread ticks twice a second but the displayed strings only
+        // change once a second, so half of these were redundant redraws of a
+        // fixed-size text box. Cheap everywhere, and on e-ink it halves the
+        // number of panel updates the clock costs.
+        final String white = localClock.getWhiteRemainingTime();
+        final String black = localClock.getBlackRemainingTime();
+        if (!white.contentEquals(textViewWhiteClockTIme.getText())) {
+            textViewWhiteClockTIme.setText(white);
+        }
+        if (!black.contentEquals(textViewBlackClockTime.getText())) {
+            textViewBlackClockTime.setText(black);
+        }
 
         if (localClock.isClockConfigured()) {
             long white = localClock.getWhiteRemaining();

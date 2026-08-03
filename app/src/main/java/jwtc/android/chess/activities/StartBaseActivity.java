@@ -58,6 +58,9 @@ public class StartBaseActivity extends AppCompatActivity {
         }
 
         EinkMode.load(prefs);
+        if (EinkMode.isEnabled()) {
+            setTheme(R.style.ChessStartEink);
+        }
 
         if (prefs.getBoolean("nightMode", false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);

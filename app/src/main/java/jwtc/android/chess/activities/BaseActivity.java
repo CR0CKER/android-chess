@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 
 import jwtc.android.chess.HtmlActivity;
 import jwtc.android.chess.R;
+import jwtc.android.chess.helpers.EinkMode;
 import jwtc.android.chess.helpers.MyPGNProvider;
 import jwtc.android.chess.helpers.Utils;
 import jwtc.android.chess.play.SaveGameDialog;
@@ -40,6 +41,13 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Must run before the subclass calls setContentView, so the monochrome
+        // palette is in place when the layout is inflated.
+        EinkMode.load(getPrefs());
+        if (EinkMode.isEnabled()) {
+            setTheme(R.style.ChessThemeEink);
+        }
 
         this.am = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
     }
