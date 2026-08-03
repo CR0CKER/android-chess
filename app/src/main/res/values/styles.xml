@@ -19,7 +19,18 @@
         is what produced black-on-black labels; outlined starts transparent, so
         the worst case is an invisible fill rather than an unreadable one.
     -->
-    <style name="ChessButtonEink" parent="Widget.Material3.Button.OutlinedButton">
+    <style name="ChessButtonEink" parent="Widget.Material3.Button.OutlinedButton.Icon">
+        <!--
+            The .Icon variant is deliberate, and this button carries no icon.
+
+            ChessImageButtonEink is colour-identical to this style and renders
+            correctly; this one rendered black on black. Their only structural
+            difference was the parent, so it is pinned to the variant that is
+            known to work rather than the one that is not. The mechanism is not
+            understood, which is why the parent is the single thing changed here.
+        -->
+        <item name="enforceMaterialTheme">true</item>
+        <item name="enforceTextAppearance">false</item>
         <item name="android:textColor">@color/eink_button_foreground</item>
         <item name="android:tint">@color/eink_button_foreground</item>
         <item name="iconTint">@color/eink_button_foreground</item>

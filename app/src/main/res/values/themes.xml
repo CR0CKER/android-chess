@@ -80,6 +80,7 @@
         leaves a ghost on every tap.
     -->
     <style name="ChessThemeEink" parent="ChessTheme">
+        <item name="materialAlertDialogTheme">@style/ChessAlertDialogThemeEink</item>
         <item name="colorOutline">@color/einkForeground</item>
         <item name="colorOutlineVariant">@color/einkForeground</item>
         <item name="colorOnSurfaceVariant">@color/einkForeground</item>
@@ -108,6 +109,7 @@
     </style>
 
     <style name="ChessStartEink" parent="ChessStart">
+        <item name="materialAlertDialogTheme">@style/ChessAlertDialogThemeEink</item>
         <item name="colorOutline">@color/einkForeground</item>
         <item name="colorOutlineVariant">@color/einkForeground</item>
         <item name="colorOnSurfaceVariant">@color/einkForeground</item>
@@ -135,6 +137,7 @@
     </style>
 
     <style name="ChessDialogThemeEink" parent="ChessDialogTheme">
+        <item name="materialAlertDialogTheme">@style/ChessAlertDialogThemeEink</item>
         <item name="colorOutline">@color/einkForeground</item>
         <item name="colorOutlineVariant">@color/einkForeground</item>
         <item name="colorOnSurfaceVariant">@color/einkForeground</item>
@@ -166,5 +169,20 @@
         <item name="buttonBarPositiveButtonStyle">@style/ChessButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/ChessButton</item>
         <item name="buttonBarNeutralButtonStyle">@style/ChessButton</item>
+    </style>
+
+    <!--
+        Both e-ink themes inherited materialAlertDialogTheme from their parents,
+        so every MaterialAlertDialog kept the colour button bar: the promotion
+        picker, the exit and castle confirms, the create-new-line confirm.
+    -->
+    <style name="ChessAlertDialogThemeEink" parent="ChessAlertDialogTheme">
+        <item name="buttonBarPositiveButtonStyle">@style/ChessButtonEink</item>
+        <item name="buttonBarNegativeButtonStyle">@style/ChessButtonEink</item>
+        <item name="buttonBarNeutralButtonStyle">@style/ChessButtonEink</item>
+        <item name="colorSurface">@color/einkBackground</item>
+        <item name="colorOnSurface">@color/einkForeground</item>
+        <item name="android:textColorPrimary">@color/einkForeground</item>
+        <item name="android:textColorSecondary">@color/einkForeground</item>
     </style>
 </resources>
