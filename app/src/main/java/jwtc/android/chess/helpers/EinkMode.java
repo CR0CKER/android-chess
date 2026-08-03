@@ -25,7 +25,17 @@ public class EinkMode {
 
     public static final String PREF_KEY = "einkMode";
 
-    private static boolean enabled = false;
+    /**
+     * On by default in this fork: it exists to be run on e-ink hardware, and a
+     * fresh install that comes up in the colour theme is a trap — the stock
+     * filled buttons render on greyscale as dark blocks that look like a
+     * styling bug rather than a mode that is simply switched off.
+     *
+     * Upstream would default this to false.
+     */
+    public static final boolean DEFAULT_ENABLED = true;
+
+    private static boolean enabled = DEFAULT_ENABLED;
 
     public static boolean isEnabled() {
         return enabled;
@@ -36,7 +46,7 @@ public class EinkMode {
      * the other appearance preferences.
      */
     public static void load(SharedPreferences prefs) {
-        enabled = prefs.getBoolean(PREF_KEY, false);
+        enabled = prefs.getBoolean(PREF_KEY, DEFAULT_ENABLED);
     }
 
     /**

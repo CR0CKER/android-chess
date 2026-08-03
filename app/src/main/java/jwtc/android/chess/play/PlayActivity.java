@@ -814,7 +814,7 @@ public class PlayActivity extends ChessBoardActivity implements
                 break;
 
             case REQUEST_GAME_SETTINGS:
-                if (getPrefs().getBoolean(EinkMode.PREF_KEY, false) != EinkMode.isEnabled()) {
+                if (getPrefs().getBoolean(EinkMode.PREF_KEY, EinkMode.DEFAULT_ENABLED) != EinkMode.isEnabled()) {
                     // The theme is chosen in onCreate, so switching needs a fresh
                     // activity rather than just a redraw.
                     recreate();
