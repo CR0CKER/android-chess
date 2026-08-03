@@ -83,6 +83,8 @@ public class ColorSchemes {
         // hold cleanly. The dark square is deliberately mid-grey rather than
         // near-black: Alpha black pieces are solid #101010 with no light
         // outline, so they would disappear against a black square.
+        // Kept in step with @color/einkBoardDark, which tints switch tracks and
+        // selected toggles so "active" reads the same everywhere.
         colorScheme[EINK][0] = 0xff9e9e9e; // dark square
         colorScheme[EINK][1] = 0xffffffff; // light square
         colorScheme[EINK][2] = 0xff4d4d4d; // selected square

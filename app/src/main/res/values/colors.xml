@@ -22,5 +22,10 @@
     <color name="einkBackground">#ffffff</color>
     <color name="einkForeground">#000000</color>
     <color name="einkSurface">#e0e0e0</color>
-    <color name="einkMidtone">#757575</color>
+    <!--
+        Same grey as the dark board square in ColorSchemes.EINK; keep the two in
+        step. Used wherever e-ink needs an "active" or "filled" tone: switch
+        tracks, selected toggle buttons.
+    -->
+    <color name="einkBoardDark">#9e9e9e</color>
 </resources>
