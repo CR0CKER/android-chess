@@ -17,4 +17,7 @@
         theme's materialButtonStyle instead, which is observed to work.
     -->
     <attr name="chessImageButtonStyle" format="reference" />
+
+    <!-- Toggle group children, which need to invert to show selection. -->
+    <attr name="chessToggleButtonStyle" format="reference" />
 </resources>

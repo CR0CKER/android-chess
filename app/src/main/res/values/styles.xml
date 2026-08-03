@@ -61,7 +61,43 @@
         overriding only geometry, removes the difference rather than trying to
         reproduce it. The underlying mechanism is still not understood.
     -->
+    <!--
+        Standalone e-ink text buttons are deliberately solid black with white
+        labels.
+
+        They cannot be made to render as outlined: with background tint, drawable
+        state, stroke, insets and drawable tree all measured identical to the
+        image buttons that do render correctly, they still paint black at every
+        pixel. Rather than keep chasing that, the black is made intentional and
+        the label inverted so it is readable. Toggle group children are excluded
+        via chessToggleButtonStyle, since those do render correctly and need to
+        invert to show selection.
+    -->
     <style name="ChessButtonEink" parent="Widget.Material3.Button.OutlinedButton.Icon">
+        <item name="enforceMaterialTheme">true</item>
+        <item name="enforceTextAppearance">false</item>
+        <item name="android:textColor">@color/einkBackground</item>
+        <item name="iconTint">@color/einkBackground</item>
+        <item name="backgroundTint">@color/einkForeground</item>
+        <item name="strokeColor">@color/einkForeground</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="elevation">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:layout_height">@dimen/imageButtonSize</item>
+        <item name="android:layout_margin">4dip</item>
+    </style>
+
+    <!--
+        Toggle group children render correctly, so they keep the inverting
+        lists: white with a black label when unselected, black with a white
+        label when selected.
+    -->
+    <style name="ChessToggleButtonEink" parent="Widget.Material3.Button.OutlinedButton.Icon">
         <item name="enforceMaterialTheme">true</item>
         <item name="enforceTextAppearance">false</item>
         <item name="android:textColor">@color/eink_button_foreground</item>
@@ -72,19 +108,10 @@
         <item name="rippleColor">@android:color/transparent</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="elevation">0dp</item>
-        <!--
-            Zeroed insets are the fix, and the only measured difference from the
-            image-button style that renders correctly. With the default 8px
-            inset the ripple content shape is shrunk while the second, uninset
-            shape layer still covers the full bounds and paints over it, so the
-            white fill never reaches the screen.
-        -->
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="android:layout_height">@dimen/imageButtonSize</item>
-        <item name="android:layout_margin">4dip</item>
     </style>
 
     <style name="ChessImageButton" parent="Widget.Material3.Button.Icon">
