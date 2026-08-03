@@ -30,7 +30,8 @@
                 android:text="@string/hotspot_connect"
                 android:layout_width="wrap_content"
                 android:layout_margin="8dip"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -61,7 +62,9 @@
                 android:id="@+id/ButtonDisconnect"
                 android:text="@string/hotspot_disconnect"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -75,14 +78,17 @@
                 android:id="@+id/ButtonResign"
                 android:text="@string/hotspot_resign"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonDraw"
                 android:text="@string/hotspot_draw"
                 android:layout_width="wrap_content"
                 android:layout_marginStart="16dp"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -119,7 +125,9 @@
                 android:id="@+id/ButtonNew"
                 android:text="@string/hotspot_new"
                 android:layout_width="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_height="@dimen/imageButtonSize"
+                android:layout_margin="4dip"
+                />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

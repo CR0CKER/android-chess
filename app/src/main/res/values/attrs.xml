@@ -8,10 +8,13 @@
     <attr name="paneBackground" format="reference|color" />
 
     <!--
-        Button styles as theme attributes. The layouts reference these instead of
-        a concrete style so e-ink mode can swap in flat, outlined variants without
-        touching every layout.
+        Image-button style as a theme attribute, so e-ink can swap in a flat
+        outlined variant without touching every layout.
+
+        There is deliberately no chessButtonStyle twin. Text buttons referencing
+        one via style="?attr/..." rendered black on black in e-ink mode even when
+        the referenced style was colour-identical to this one; they take the
+        theme's materialButtonStyle instead, which is observed to work.
     -->
-    <attr name="chessButtonStyle" format="reference" />
     <attr name="chessImageButtonStyle" format="reference" />
 </resources>

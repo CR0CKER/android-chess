@@ -96,21 +96,24 @@
                         android:text="@string/button_cancel"
                         android:layout_width="wrap_content"
                         android:layout_marginEnd="2dp"
-                        style="?attr/chessButtonStyle" />
+                        android:layout_height="@dimen/imageButtonSize"
+                        />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/ButtonSetupOptionsRandom"
                         android:text="@string/choice_random"
                         android:layout_width="wrap_content"
                         android:layout_margin="2dp"
-                        style="?attr/chessButtonStyle" />
+                        android:layout_height="@dimen/imageButtonSize"
+                        />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/ButtonSetupOptionsOk"
                         android:text="@string/button_ok"
                         android:layout_width="wrap_content"
                         android:layout_marginStart="2dp"
-                        style="?attr/chessButtonStyle" />
+                        android:layout_height="@dimen/imageButtonSize"
+                        />
                 </TableRow>
 
             </TableLayout>

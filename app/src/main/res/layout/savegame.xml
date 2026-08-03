@@ -77,7 +77,8 @@
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_margin="4dip"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonSaveCopy"
@@ -86,7 +87,8 @@
                 android:enabled="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_margin="4dip"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonSaveSave"
@@ -94,7 +96,8 @@
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="?attr/chessButtonStyle" />
+                android:layout_margin="4dip"
+                />
 
         </LinearLayout>
     </LinearLayout>
