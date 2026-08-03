@@ -12,6 +12,7 @@ import android.util.Log;
 import android.util.TypedValue;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.shape.MaterialShapeDrawable;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -117,6 +118,21 @@ public class EinkDiagnostics {
         sb.append(pad).append(d.getClass().getSimpleName());
         if (d instanceof LayerDrawable) {
             sb.append(" layers=").append(((LayerDrawable) d).getNumberOfLayers());
+        }
+        // The class names never showed where the black comes from; the shapes'
+        // own fill and stroke do.
+        if (d instanceof MaterialShapeDrawable) {
+            final MaterialShapeDrawable msd = (MaterialShapeDrawable) d;
+            sb.append(" fill=").append(msd.getFillColor() == null ? "null"
+                : hex(msd.getFillColor().getDefaultColor()));
+            sb.append(" strokeCol=").append(msd.getStrokeColor() == null ? "null"
+                : hex(msd.getStrokeColor().getDefaultColor()));
+            sb.append(" strokeW=").append(msd.getStrokeWidth());
+            sb.append(" tint=").append(msd.getTintList() == null ? "null"
+                : hex(msd.getTintList().getDefaultColor()));
+            sb.append(" alpha=").append(msd.getAlpha());
+            sb.append(" bounds=").append(msd.getBounds().width()).append('x')
+                .append(msd.getBounds().height());
         }
         sb.append('\n');
         if (depth > 4) {
