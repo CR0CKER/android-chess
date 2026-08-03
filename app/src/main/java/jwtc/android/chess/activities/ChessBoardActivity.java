@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import jwtc.android.chess.constants.ColorSchemes;
+import jwtc.android.chess.helpers.EinkMode;
 import jwtc.android.chess.helpers.HapticFeedback;
 import jwtc.android.chess.helpers.MagnifyingDragShadowBuilder;
 import jwtc.android.chess.helpers.Sounds;
@@ -374,6 +375,8 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
 
         SharedPreferences prefs = getPrefs();
 
+        EinkMode.load(prefs);
+
         ColorSchemes.showCoords = prefs.getBoolean("showCoords", false);
         ColorSchemes.saturationFactor = prefs.getFloat("squareSaturation", 1.0f);
 
@@ -388,6 +391,8 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
         } catch (NumberFormatException ex) {
             Log.e(TAG, ex.getMessage());
         }
+
+        EinkMode.applyBoardAppearance();
 
         PieceSets.selectedBlindfoldMode = PieceSets.BLINDFOLD_SHOW_PIECES;
 
@@ -431,7 +436,9 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
             textViewBlackPieces.setVisibility(visibilityPiecesDescriptions);
         }
 
-        showMoves = prefs.getBoolean("showMoves", false);
+        // With dragging disabled, the destination dots are the only cue for where
+        // a selected piece may go, so they are not optional on e-ink.
+        showMoves = prefs.getBoolean("showMoves", false) || EinkMode.isEnabled();
         hapticFeedback.setEnabled(prefs.getBoolean("useHapticFeedback", false));
     }
 
@@ -997,10 +1004,17 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
 
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_ENTERED:
-                        view.setSelected(true);
+                        // Repainting each square the finger crosses leaves a ghost
+                        // trail on e-ink. Unreachable while e-ink mode disables
+                        // dragging, but kept correct if dragging is re-enabled.
+                        if (!EinkMode.isEnabled()) {
+                            view.setSelected(true);
+                        }
                         break;
                     case DragEvent.ACTION_DRAG_EXITED:
-                        view.setSelected(false);
+                        if (!EinkMode.isEnabled()) {
+                            view.setSelected(false);
+                        }
                         break;
                     case DragEvent.ACTION_DRAG_STARTED:
                         // all listeners allow drag started
@@ -1205,6 +1219,15 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
                     return true;
                 }
+            } else if (EinkMode.isEnabled() && view instanceof ChessPieceView) {
+                // No drag on e-ink: the drag shadow is a translucent surface the
+                // compositor slides at touch frame rate, which smears across the
+                // panel. Tap to select, tap the destination to move.
+                if (action == MotionEvent.ACTION_UP) {
+                    ChessBoardActivity.this.selectPosition(((ChessPieceView) view).getPos());
+                    return true;
+                }
+                return action == MotionEvent.ACTION_DOWN;
             } else if (view instanceof ChessPieceView) {
                 if (action == MotionEvent.ACTION_DOWN) {
                     final ChessPieceView pieceView = (ChessPieceView) view;
@@ -1343,6 +1366,7 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
 
     protected void selectPosition(int pos) {
         Log.d(TAG, "selectPosition " + pos + ", " + selectedPosition);
+        final boolean wasMoveTarget = moveToPositions.contains(Integer.valueOf(pos));
         moveToPositions.clear();
         if (gameApi.isEnded()) {
             selectedPosition = -1;
@@ -1372,7 +1396,19 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 }
                 updateSelectedSquares();
             } else if (selectedPosition != pos) {
-                handleMove(pos);
+                if (EinkMode.isEnabled() && !wasMoveTarget && pos != jni.getDuckPos()
+                    && jni.pieceAt(jni.getTurn(), pos) != BoardConstants.FIELD) {
+                    // Tapping another of your own pieces re-selects it instead of
+                    // attempting an illegal move. Dragging is unavailable on e-ink,
+                    // so the rejected-move detour would cost two more full board
+                    // repaints before the user could try again.
+                    selectedPosition = pos;
+                    setMoveToPositions(pos);
+                    feedbackSelect();
+                    updateSelectedSquares();
+                } else {
+                    handleMove(pos);
+                }
             } else {
                 if (jni.isAmbiguousCastle(selectedPosition, pos) != 0) {
                     handleAmbiguousCastle(selectedPosition, pos);

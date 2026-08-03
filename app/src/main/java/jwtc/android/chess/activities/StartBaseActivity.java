@@ -25,6 +25,7 @@ import jwtc.android.chess.R;
 import jwtc.android.chess.helpers.StartItem;
 import jwtc.android.chess.helpers.StartItemAdapter;
 import jwtc.android.chess.helpers.ActivityHelper;
+import jwtc.android.chess.helpers.EinkMode;
 import jwtc.android.chess.hotspotboard.HotspotBoardActivity;
 import jwtc.android.chess.ics.ICSClient;
 import jwtc.android.chess.lichess.LichessActivity;
@@ -55,6 +56,8 @@ public class StartBaseActivity extends AppCompatActivity {
         } else {
             resources.updateConfiguration(configuration, displayMetrics);
         }
+
+        EinkMode.load(prefs);
 
         if (prefs.getBoolean("nightMode", false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -103,6 +106,7 @@ public class StartBaseActivity extends AppCompatActivity {
         list = findViewById(R.id.startItemsRecycler);
         list.setLayoutManager(new GridLayoutManager(this, spanCount));
         list.setAdapter(startItemAdapter);
+        EinkMode.applyTo(list);
         list.requestFocus();
     }
 }

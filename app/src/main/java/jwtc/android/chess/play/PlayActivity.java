@@ -35,6 +35,7 @@ import java.util.Date;
 import jwtc.android.chess.GamesListActivity;
 import jwtc.android.chess.helpers.ActivityHelper;
 import jwtc.android.chess.helpers.Clipboard;
+import jwtc.android.chess.helpers.EinkMode;
 import jwtc.android.chess.helpers.MoveRecyclerAdapter;
 import jwtc.android.chess.helpers.MyPGNProvider;
 import jwtc.android.chess.R;
@@ -269,6 +270,7 @@ public class PlayActivity extends ChessBoardActivity implements
         moveAdapter = new MoveRecyclerAdapter(this, gameApi, this);
         historyRecyclerView.setAdapter(moveAdapter);
         historyRecyclerView.setHorizontalScrollBarEnabled(true);
+        EinkMode.applyTo(historyRecyclerView);
 
         ecoService.load(getAssets());
     }
@@ -693,7 +695,10 @@ public class PlayActivity extends ChessBoardActivity implements
         if (showProgress) {
             playButton.setIconResource(R.drawable.box_arrow_up_right);
             //playButton.setVisibility(View.GONE);
-            progressBarEngine.setVisibility(View.VISIBLE);
+            // The indeterminate bar loops for as long as the engine thinks, which
+            // on e-ink is an unbroken refresh cycle. The button icon above
+            // already says the engine is busy, so leave the bar hidden.
+            progressBarEngine.setVisibility(EinkMode.isEnabled() ? View.INVISIBLE : View.VISIBLE);
         } else {
             playButton.setIconResource(R.drawable.ic_robot);
             progressBarEngine.setVisibility(View.INVISIBLE);
