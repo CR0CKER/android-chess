@@ -22,4 +22,5 @@
     <color name="einkBackground">#ffffff</color>
     <color name="einkForeground">#000000</color>
     <color name="einkSurface">#e0e0e0</color>
+    <color name="einkMidtone">#757575</color>
 </resources>
