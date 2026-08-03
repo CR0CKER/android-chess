@@ -58,6 +58,10 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
     protected TextToSpeechApi textToSpeech;
     protected int selectedPosition = -1, premoveFrom = -1, premoveTo = -1, dpadPos = -1;
     protected int correctPosition = -1, wrongPosition = -1;
+    // What the piece views on screen were last drawn with. rebuildBoard reuses
+    // views, so a change of piece set or blindfold mode has to force a reload
+    // that the per-square diff would otherwise skip.
+    private int lastRenderedPieceSet = -1, lastRenderedBlindfoldMode = -1;
     protected ArrayList<Integer> highlightedPositions = new ArrayList<Integer>();
     protected ArrayList<Integer> moveToPositions = new ArrayList<Integer>();
 
@@ -580,7 +584,6 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
 
     public void rebuildBoard() {
 
-        chessBoardView.removePieces();
         chessBoardView.removeLabels();
 
         final int state = gameApi.getState();
@@ -626,6 +629,9 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 break;
         }
 
+        // What the position requires on each square.
+        final int[] targetColor = new int[64];
+        final int[] targetPiece = new int[64];
         for (int i = 0; i < 64; i++) {
             int color = turn == BoardConstants.BLACK ? BoardConstants.WHITE : BoardConstants.BLACK;
             int piece = i == duckPos ? BoardConstants.DUCK : jni.pieceAt(color, i);
@@ -633,29 +639,107 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 color = turn;
                 piece = jni.pieceAt(color, i);
             }
+            targetColor[i] = color;
+            targetPiece[i] = piece;
+        }
 
-            if (piece != BoardConstants.FIELD) {
-                ChessPieceView p = new ChessPieceView(this, color, piece, i);
-                p.setOnTouchListener(myTouchListener);
+        // Diff the existing piece views against that, rather than removing all of
+        // them and building 32 replacements on every move. A full teardown makes
+        // the whole board relayout and repaint, which on an e-ink panel is a
+        // visible flash for what is usually a two-square change.
+        final boolean pieceImagesStale = lastRenderedPieceSet != PieceSets.selectedSet
+            || lastRenderedBlindfoldMode != PieceSets.selectedBlindfoldMode;
+        lastRenderedPieceSet = PieceSets.selectedSet;
+        lastRenderedBlindfoldMode = PieceSets.selectedBlindfoldMode;
 
-                chessBoardView.addView(p);
+        final ChessPieceView[] onSquare = new ChessPieceView[64];
+        final ArrayList<ChessPieceView> reusable = new ArrayList<>();
 
-                if (piece == BoardConstants.KING) {
-                    if (color == BoardConstants.WHITE && labelForWhiteKing != null) {
-                        ChessPieceLabelView labelView = new ChessPieceLabelView(this, i, color, labelForWhiteKing);
-                        chessBoardView.addView(labelView);
-                    } else if (color == BoardConstants.BLACK && labelForBlackKing != null) {
-                        ChessPieceLabelView labelView = new ChessPieceLabelView(this, i, color, labelForBlackKing);
-                        chessBoardView.addView(labelView);
+        for (int i = chessBoardView.getChildCount() - 1; i >= 0; i--) {
+            final View child = chessBoardView.getChildAt(i);
+            if (child instanceof ChessPieceView) {
+                final ChessPieceView pieceView = (ChessPieceView) child;
+                final int pos = pieceView.getPos();
+                final boolean stillCorrect = pos >= 0 && pos < 64
+                    && onSquare[pos] == null
+                    && pieceView.getPiece() == targetPiece[pos]
+                    && pieceView.getColor() == targetColor[pos];
+                if (stillCorrect) {
+                    onSquare[pos] = pieceView;
+                    if (pieceImagesStale) {
+                        pieceView.resetImageResource();
                     }
+                    // A drag can leave the source view hidden.
+                    if (pieceView.getVisibility() != View.VISIBLE) {
+                        pieceView.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    reusable.add(pieceView);
                 }
-                if (correctPosition == i) {
-                    ChessPieceLabelView labelView = new ChessPieceLabelView(this, i, color, ChessPieceLabelView.CORRECT);
-                    chessBoardView.addView(labelView);
-                } else if (wrongPosition == i) {
-                    ChessPieceLabelView labelView = new ChessPieceLabelView(this, i, color, ChessPieceLabelView.WRONG);
-                    chessBoardView.addView(labelView);
+            }
+        }
+
+        for (int i = 0; i < 64; i++) {
+            if (targetPiece[i] == BoardConstants.FIELD || onSquare[i] != null) {
+                continue;
+            }
+
+            ChessPieceView pieceView = null;
+
+            // Prefer a spare already depicting this piece, so a move only costs a
+            // relayout and no drawable reload.
+            for (int j = reusable.size() - 1; j >= 0; j--) {
+                final ChessPieceView candidate = reusable.get(j);
+                if (candidate.getPiece() == targetPiece[i] && candidate.getColor() == targetColor[i]) {
+                    pieceView = reusable.remove(j);
+                    break;
                 }
+            }
+            if (pieceView == null && !reusable.isEmpty()) {
+                pieceView = reusable.remove(reusable.size() - 1);
+            }
+
+            if (pieceView == null) {
+                pieceView = new ChessPieceView(this, targetColor[i], targetPiece[i], i);
+                pieceView.setOnTouchListener(myTouchListener);
+                chessBoardView.addView(pieceView);
+            } else {
+                pieceView.reset(targetColor[i], targetPiece[i], i);
+                if (pieceImagesStale) {
+                    pieceView.resetImageResource();
+                }
+                if (pieceView.getVisibility() != View.VISIBLE) {
+                    pieceView.setVisibility(View.VISIBLE);
+                }
+                // Nothing was added or removed, so no layout pass is scheduled;
+                // place the view at its new square directly.
+                chessBoardView.layoutChild(pieceView);
+            }
+            onSquare[i] = pieceView;
+        }
+
+        for (int i = 0; i < reusable.size(); i++) {
+            chessBoardView.removeView(reusable.get(i));
+        }
+
+        for (int i = 0; i < 64; i++) {
+            final int piece = targetPiece[i];
+            if (piece == BoardConstants.FIELD) {
+                continue;
+            }
+            final int color = targetColor[i];
+
+            if (piece == BoardConstants.KING) {
+                if (color == BoardConstants.WHITE && labelForWhiteKing != null) {
+                    chessBoardView.addView(new ChessPieceLabelView(this, i, color, labelForWhiteKing));
+                } else if (color == BoardConstants.BLACK && labelForBlackKing != null) {
+                    chessBoardView.addView(new ChessPieceLabelView(this, i, color, labelForBlackKing));
+                }
+            }
+            if (correctPosition == i) {
+                chessBoardView.addView(new ChessPieceLabelView(this, i, color, ChessPieceLabelView.CORRECT));
+            } else if (wrongPosition == i) {
+                chessBoardView.addView(new ChessPieceLabelView(this, i, color, ChessPieceLabelView.WRONG));
             }
         }
 

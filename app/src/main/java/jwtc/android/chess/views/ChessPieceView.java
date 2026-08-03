@@ -59,6 +59,26 @@ public class ChessPieceView extends AppCompatImageView {
         resetImageResource();
     }
 
+    /**
+     * Point an existing view at a different square, and optionally a different
+     * piece, so the board can be updated by diffing rather than by destroying
+     * and recreating every piece view on each move.
+     *
+     * The image is only reloaded when the piece it depicts actually changed.
+     *
+     * @return true if the drawable was reloaded
+     */
+    public boolean reset(int color, int piece, int pos) {
+        final boolean depictsSomethingElse = this.color != color || this.piece != piece;
+        this.color = color;
+        this.piece = piece;
+        this.pos = pos;
+        if (depictsSomethingElse) {
+            resetImageResource();
+        }
+        return depictsSomethingElse;
+    }
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
