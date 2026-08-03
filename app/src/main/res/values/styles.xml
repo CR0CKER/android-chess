@@ -72,6 +72,17 @@
         <item name="rippleColor">@android:color/transparent</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="elevation">0dp</item>
+        <!--
+            Zeroed insets are the fix, and the only measured difference from the
+            image-button style that renders correctly. With the default 8px
+            inset the ripple content shape is shrunk while the second, uninset
+            shape layer still covers the full bounds and paints over it, so the
+            white fill never reaches the screen.
+        -->
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
         <item name="android:layout_height">@dimen/imageButtonSize</item>
         <item name="android:layout_margin">4dip</item>
     </style>
