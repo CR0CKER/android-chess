@@ -99,8 +99,6 @@ public class PuzzleActivity extends ChessBoardActivity implements EngineListener
         butRetry.setOnClickListener(arg0 -> startPuzzle());
 
         butShow = findViewById(R.id.ButtonPuzzleShow);
-        // TEMPORARY: sample what these buttons actually paint.
-        butShow.post(() -> jwtc.android.chess.helpers.EinkDiagnostics.dump(this, butShow, butRetry));
         butShow.setOnClickListener(arg0 -> {
             showMove = true;
             gameApi.jumpToBoardNum(numMoved);
