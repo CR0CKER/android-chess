@@ -21,6 +21,7 @@
             <TableRow>
 
                 <com.google.android.material.button.MaterialButton
+                android:layout_height="wrap_content"
                     android:id="@+id/ButtonMenu"
                     android:text="@string/button_close"
                     android:layout_width="wrap_content"
