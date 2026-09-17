@@ -533,7 +533,10 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
             textViewBlackPieces.setVisibility(visibilityPiecesDescriptions);
         }
 
-        showMoves = prefs.getBoolean("showMoves", false);
+        // Same default as BoardPreferencesActivity. With the two disagreeing,
+        // move dots stayed off until the settings screen was opened once, which
+        // then showed the box ticked and wrote it back as on.
+        showMoves = prefs.getBoolean("showMoves", true);
         hapticFeedback.setEnabled(prefs.getBoolean("useHapticFeedback", false));
     }
 
