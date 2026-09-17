@@ -91,8 +91,10 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         });
 
         checkBoxEinkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (!buttonView.isPressed() || isChecked == EinkMode.isEnabled()) {
+            if (isChecked == EinkMode.isEnabled()) {
                 // Fired by setChecked while restoring state, not by the user.
+                // Not tested with isPressed(): a TalkBack double-tap or a
+                // keyboard toggle is a real change but never presses the view.
                 return;
             }
             EinkMode.setEnabled(isChecked);
