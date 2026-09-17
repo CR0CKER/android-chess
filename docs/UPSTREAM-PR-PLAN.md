@@ -1,6 +1,6 @@
 # Upstream contribution plan
 
-Last updated: 2026-09-17 07:04 AM CDT
+Last updated: 2026-09-17 02:44 PM CDT
 
 How to get work from this fork into
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess). Written while the
@@ -11,9 +11,8 @@ a device-specific feature with generic fixes, and it defaults behaviour based on
 detection. Split it.
 
 **Order agreed 2026-09-17:** first open a feature request asking whether an e-ink mode
-would be welcome at all (draft kept outside the repo), then device-test the branch
-rebased onto upstream 10.4.0, and only then prepare a PR. Tier 3 below is fork-only
-*unless* the maintainer says yes to that request.
+would be welcome at all, then device-test the branch rebased onto upstream 10.4.0, and
+only then prepare a PR. Tier 3 below is fork-only *unless* the maintainer says yes.
 
 **Commit hashes** below are those of the branch after it was rebased onto upstream
 `4be3f52` (10.4.0) on 2026-09-17. The pre-rebase history is kept at tag
@@ -23,6 +22,7 @@ rebased onto upstream 10.4.0, and only then prepare a PR. Tier 3 below is fork-o
 
 ## Contents
 
+- [Where this stands](#where-this-stands)
 - [Before you start](#before-you-start)
 - [Tier 1 — send these first](#tier-1--send-these-first)
 - [Tier 2 — plausible, needs discussion](#tier-2--plausible-needs-discussion)
@@ -31,6 +31,40 @@ rebased onto upstream 10.4.0, and only then prepare a PR. Tier 3 below is fork-o
 - [Known frictions](#known-frictions)
 
 ---
+
+## Where this stands
+
+**Waiting on a reply to [issue #241](https://github.com/jcarolus/android-chess/issues/241)**
+(opened 2026-09-17, "FEATURE REQUEST: E-ink mode for e-paper Android devices"). It asks
+three questions: whether the feature is wanted at all, whether it should default on via
+vendor detection, and whether converting layouts from `style="@style/ChessButton"` to
+theme attributes is acceptable. It also lists the Tier 1 fixes as separately sendable.
+Two Poke3 screenshots are attached.
+
+Branch state: `eink` is rebased onto upstream `4be3f52` (10.4.0), CI green, and tested on
+the Poke3 — normal play is good. Pre-rebase history is at tag `eink-pre-sync-2026-09-17`,
+on the fork as well as locally.
+
+**What to do when the maintainer answers:**
+
+| Answer | Next step |
+|---|---|
+| Yes to e-ink mode | Split into reviewable PRs: Tier 1 items first as their own PRs, then the feature itself. Do **not** offer the whole branch as one PR. |
+| Yes, but default off | Drop `EinkMode.defaultEnabled()` back to `false` and leave `isEinkHardware()` unused or out; everything else stands. |
+| No to the layout churn | The theme cannot reach buttons carrying an explicit `style=`. Either the feature is fork-only, or it needs a narrower mechanism agreed with the maintainer first. |
+| No / no reply | Still send Tier 1 as small independent PRs; they stand on their own. Keep e-ink fork-only. |
+
+**Positions taken in #241, for consistency if it turns into a discussion:**
+
+- Vendor-list auto-enable is *proposed*, with "off by default" offered as a fallback.
+- The solid-black text buttons are deliberately not raised. They are a workaround for an
+  unexplained rendering defect (see `EINK-NOTES.md`), the fork owner is happy with them,
+  and they are not load-bearing for the request.
+- Every claim in the issue is verifiable: the Gradle wrapper snapshot, the `onDraw`
+  allocations, the `showMoves` mismatch and the clock ticks were all re-checked against
+  `upstream/master` on 2026-09-17.
+
+<sub>[↑ Back to contents](#contents)</sub>
 
 ## Before you start
 
