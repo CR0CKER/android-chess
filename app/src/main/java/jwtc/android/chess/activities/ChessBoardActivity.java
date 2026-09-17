@@ -1669,7 +1669,6 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
 
     protected void selectPosition(int pos) {
         Log.d(TAG, "selectPosition " + pos + ", " + selectedPosition);
-        final boolean wasMoveTarget = moveToPositions.contains(Integer.valueOf(pos));
         moveToPositions.clear();
         if (gameApi.isEnded()) {
             selectedPosition = -1;
@@ -1699,8 +1698,7 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 }
                 updateSelectedSquares();
             } else if (selectedPosition != pos) {
-                if (EinkMode.isEnabled() && !wasMoveTarget && pos != jni.getDuckPos()
-                    && jni.pieceAt(jni.getTurn(), pos) != BoardConstants.FIELD) {
+                if (EinkMode.isEnabled() && isReselectTap(pos)) {
                     // Tapping another of your own pieces re-selects it instead of
                     // attempting an illegal move. Dragging is unavailable on e-ink,
                     // so the rejected-move detour would cost two more full board
@@ -1722,6 +1720,26 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 updateSelectedSquares();
             }
         }
+    }
+
+    /**
+     * Whether tapping pos while another square is selected means "select this
+     * piece instead" rather than a move attempt.
+     *
+     * Decided from the board alone, not from moveToPositions, which is only
+     * filled when "Show moves" is on and only for the side to move. A move
+     * onto a square holding one of your own pieces can only be castling, and
+     * the engine accepts a king move along its own rank as a castling request
+     * (Game::requestMove), including onto its own rook. In Chess960 the
+     * king's castling square can itself hold that rook.
+     */
+    private boolean isReselectTap(int pos) {
+        final int color = getSelectableColor();
+        if (pos == jni.getDuckPos() || jni.pieceAt(color, pos) == BoardConstants.FIELD) {
+            return false;
+        }
+        return !(jni.pieceAt(color, selectedPosition) == BoardConstants.KING
+            && Pos.row(selectedPosition) == Pos.row(pos));
     }
 
     /**
