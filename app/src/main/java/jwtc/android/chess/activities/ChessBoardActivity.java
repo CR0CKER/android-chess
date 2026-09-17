@@ -141,7 +141,10 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
         final int from = Move.getFrom(move);
         final int to = Move.getTo(move);
         final boolean enteredByDragging = consumeDraggedMove(from, to);
-        final boolean usePieceAnimation = getPrefs().getBoolean(PREF_USE_PIECE_ANIMATION, true);
+        // A piece sliding across the board is a quarter second of continuous
+        // partial refreshes on e-ink, which smears exactly like a drag shadow.
+        final boolean usePieceAnimation = getPrefs().getBoolean(PREF_USE_PIECE_ANIMATION, true)
+            && !EinkMode.isEnabled();
         final ChessPieceView originalPieceView = enteredByDragging || !usePieceAnimation
             ? null
             : getPieceViewOnPosition(from);

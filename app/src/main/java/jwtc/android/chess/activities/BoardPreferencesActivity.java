@@ -159,6 +159,7 @@ public class BoardPreferencesActivity extends ChessBoardActivity {
         dropDownColorScheme.setEnabled(enabled);
         dropDownTileSet.setEnabled(enabled);
         sliderSaturation.setEnabled(enabled);
+        checkBoxUsePieceAnimation.setEnabled(enabled);
     }
 
     @Override
