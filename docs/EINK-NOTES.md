@@ -1,6 +1,6 @@
 # E-ink fork — engineering notes
 
-Last updated: 2026-09-17 07:04 AM CDT
+Last updated: 2026-09-17 02:23 PM CDT
 
 Working notes for the `eink` branch of `CR0CKER/android-chess`, a fork of
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess) (MIT) adapted for
@@ -224,9 +224,9 @@ first.
   seven call sites with no local test capability.
 - Screens never exercised in e-ink mode: Lichess (including the Swiss/Teams screens added
   in 10.4.0, whose loading spinners are still indeterminate), ICS, hotspot board, PGN tools.
-- **Rebased onto upstream 10.4.0 on 2026-09-17, not yet device-tested.** Re-test tap moves,
-  castling (standard and Chess960) with "Show moves" both on and off, and toggling the mode
-  from Board Settings.
+- **Rebased onto upstream 10.4.0 and device-tested on the Poke3, 2026-09-17** — normal play
+  is good. Not individually confirmed yet: Chess960 castling with "Show moves" off, and the
+  Lichess Swiss/Teams screens added in 10.4.0.
 - `res/anim/` is dead (nothing references `R.anim.*`), left in place to keep the upstream
   diff small.
 - `PlayActivity.onResume` ends with `postDelayed(this::updateGUI, 1000)`. This is the
