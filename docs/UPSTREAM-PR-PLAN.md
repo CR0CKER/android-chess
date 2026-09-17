@@ -1,14 +1,23 @@
 # Upstream contribution plan
 
-Last updated: 2026-08-03 04:41 PM CDT
+Last updated: 2026-09-17 07:04 AM CDT
 
 How to get work from this fork into
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess). Written while the
 context is fresh; everything below is verifiable from the branch.
 
-The `eink` branch is **not** an upstream candidate as a whole — it is 34 commits mixing
+The `eink` branch is **not** an upstream candidate as it stands — it is 41 commits mixing
 a device-specific feature with generic fixes, and it defaults behaviour based on hardware
 detection. Split it.
+
+**Order agreed 2026-09-17:** first open a feature request asking whether an e-ink mode
+would be welcome at all (draft kept outside the repo), then device-test the branch
+rebased onto upstream 10.4.0, and only then prepare a PR. Tier 3 below is fork-only
+*unless* the maintainer says yes to that request.
+
+**Commit hashes** below are those of the branch after it was rebased onto upstream
+`4be3f52` (10.4.0) on 2026-09-17. The pre-rebase history is kept at tag
+`eink-pre-sync-2026-09-17`.
 
 ---
 
@@ -26,9 +35,11 @@ detection. Split it.
 ## Before you start
 
 - Upstream has **no CI, no JVM tests, no instrumentation tests** and no `.github/`
-  directory. A maintainer cannot verify a PR automatically; keep each one small and
+  directory (re-checked 2026-09-17). A maintainer cannot verify a PR automatically; keep each one small and
   independently reviewable.
-- Upstream is a single-maintainer project. Batch-and-dump will not get reviewed. One
+- Upstream is a single-maintainer project. Batch-and-dump will not get reviewed. Of the 7
+  outside PRs merged since 2019, 4 were translations and the other 3 were small; the README does say
+  "Contributions welcome — feel free to open a PR or issue". One
   focused PR at a time, smallest and most obviously-correct first, is the way in.
 - `git config user.email` must print `6056387+CR0CKER@users.noreply.github.com` before
   any commit. Verify per clone.
@@ -45,7 +56,7 @@ detection. Split it.
 Self-contained, no behaviour change for existing users, each defensible in a paragraph.
 Cherry-pick each onto its own branch off `upstream/master`.
 
-### 1. Gradle wrapper replacement — `11f2c62`
+### 1. Gradle wrapper replacement — `2c27d51`
 
 The committed `gradle-wrapper.jar` is a **Gradle 1.6 snapshot built 2013-04-04**
 (`isSnapshot=true` in its own `build-receipt.properties`), added in a 2015 commit, while
@@ -55,19 +66,23 @@ published checksum and fails Gradle's wrapper validation.
 Replaced with the official 9.1.0 jar, sha256
 `76805e32c009c0cf0dd5d206bddc9fb22ea42e84db904b764f3047de095493f3`, matching
 `services.gradle.org/distributions/gradle-9.1.0-wrapper.jar.sha256`. `gradlew` and
-`gradlew.bat` come from the same `v9.1.0` tag.
+`gradlew.bat` come from the same `v9.1.0` tag; `gradlew.bat` must keep upstream's CRLF line
+endings (the content is otherwise identical to Gradle's).
 
 *Strongest candidate — a pure supply-chain fix with an externally verifiable checksum.*
 
 ### 2. `getHightlightColor()` ignores its own table
 
-`constants/ColorSchemes.java` returned a hardcoded `0x66ffff00` with the real lookup
-commented out, so slot `[3]` of every scheme was dead. Fix restores the table read while
-keeping every existing scheme's appearance byte-identical.
+`constants/ColorSchemes.java` returns a hardcoded `0x66ffff00` with the real lookup
+commented out, so slot `[3]` of every scheme is dead. The branch restores the table read
+but then fills slot `[3]` of every colour scheme with that same `0x66ffff00`, so the
+per-scheme values stay unused. Upstream it is a tidy-up with no visible effect, not a
+bug fix — the weakest item here; only worth sending if the maintainer wants
+per-scheme highlights.
 
-*Extract from `75e4a1c`; do not bring the e-ink scheme row with it.*
+*Extract from `1c6ec43`; do not bring the e-ink scheme row with it.*
 
-### 3. `onDraw` allocations — `5ebed50`
+### 3. `onDraw` allocations — `56fc5fa`
 
 `ChessSquareView.onDraw` inflated a `Drawable` via `getResources().getDrawable()` on every
 repaint (twice: tile pattern and D-pad focus ring) and allocated two `Rect`s.
@@ -76,14 +91,14 @@ and invalidates — a draw scheduling another draw.
 
 *Pure performance, no visual change, benefits every device.*
 
-### 4. `showMoves` default mismatch
+### 4. `showMoves` default mismatch — `22abcea`
 
-`BoardPreferencesActivity` read `showMoves` with default `true` while `ChessBoardActivity`
-used `false`. Because that screen writes every value back in `onPause`, merely opening
-board settings ticked the box and persisted `showMoves=true` for someone who never touched
-it. Both now default `false`.
-
-*Extract from `9101345`.*
+`BoardPreferencesActivity` reads `showMoves` with default `true` while `ChessBoardActivity`
+uses `false`. A fresh install therefore has no destination dots until board settings has
+been opened once; that screen then shows the box ticked and writes `showMoves=true` back
+in `onPause`. `ChessBoardActivity` now defaults to `true` too — the maintainer describes
+"Show moves" as on by default in #207. (The branch first fixed this the other way, making
+both `false`; that contradicted upstream's intent and was reversed.)
 
 ### 5. Clock and engine `setText` guards
 
@@ -91,13 +106,13 @@ it. Both now default `false`.
 clock redraws were redundant. Same guard for the engine evaluation. Both now only call
 `setText` when the string actually changes.
 
-*Extract from `42d65a0` — take the guards, not the e-ink balloon suppression.*
+*Extract from `e25bd60` — take the guards, not the e-ink balloon suppression.*
 
 <sub>[↑ Back to contents](#contents)</sub>
 
 ## Tier 2 — plausible, needs discussion
 
-### CI workflow — `a891990` + `ddd856d`
+### CI workflow — `19d77f3` + `834e620`
 
 `.github/workflows/build.yml` builds `assembleFossDebug` and uploads the APK.
 Upstream issue **#198** asked about CI/CD adoption, so there is prior interest. Open as a
@@ -108,6 +123,9 @@ Note it must accept SDK licences before installing the NDK, or `sdkmanager` stal
 interactive prompt and the build later fails with `LicenceNotAcceptedException`.
 
 ### Diff-based `rebuildBoard` — branch `perf/board-diff`, commit `728601c`
+
+*Written against the pre-10.4.0 `ChessBoardActivity`; upstream has since added ~460
+lines there (move animation, pre-moves), so expect to redo it rather than cherry-pick.*
 
 `rebuildBoard()` removes every `ChessPieceView` and constructs ~32 replacements on each
 call, from seven call sites covering every move, undo, redo, flip, setup and promotion.
@@ -135,7 +153,8 @@ Do not send these. They are device-specific or behaviour-changing:
 - `EinkMode` and the entire e-ink theme/style/drawable set
 - Vendor-based hardware detection and the resulting default
 - Forced minimal controls and forced fullscreen
-- The `ColorSchemes.EINK` row and Alpha piece-set forcing
+- The `ColorSchemes.EINK` row (index 10, after upstream's `CUSTOM_COLOR_SCHEME` 9) and
+  Alpha piece-set forcing
 - Solid-black text buttons (a workaround for an unexplained rendering defect, not a fix)
 - Conversion of `ChessButton`/`ChessImageButton` to theme attributes, and the removal of
   `style=` from 48 layout buttons — churn that only exists to support e-ink theming
@@ -147,7 +166,7 @@ Do not send these. They are device-specific or behaviour-changing:
 ```bash
 git fetch upstream
 git checkout -b upstream/gradle-wrapper upstream/master
-git cherry-pick 11f2c62
+git cherry-pick 2c27d51
 # build check: push and let this fork's CI run it, since there is no local toolchain
 git push -u origin upstream/gradle-wrapper
 gh pr create -R jcarolus/android-chess --base master \
@@ -171,13 +190,11 @@ to point at.
 
 - **No upstream CI**, so a PR arrives unverified from the maintainer's point of view.
   Mentioning that this fork's Actions build is green helps.
-- **The fork's history is not linear against upstream** — 34 commits including a revert
-  and several diagnostic add/remove pairs. Always cherry-pick onto a fresh branch; never
+- **The fork's history is not linear against upstream** — 41 commits including several
+  diagnostic add/remove pairs. Always cherry-pick onto a fresh branch; never
   propose `eink` directly.
-- **Commit `728601c` is reachable from both `eink` and `perf/board-diff`.** It is in
-  `eink`'s history but its changes were undone there by the revert `5803868`, so a
-  cherry-pick of `728601c` alone gives you the working implementation. Do not assume the
-  code is present just because the commit is an ancestor.
+- **Commit `728601c` now lives only on `perf/board-diff`** (and the pre-rebase tag). The
+  add/revert pair was dropped from `eink` when rebasing, as it changed nothing there.
 - Several Tier-1 items are *embedded in larger e-ink commits* rather than isolated, so
   they need extracting by hand rather than a clean cherry-pick. The commit hashes above
   name where to find them.

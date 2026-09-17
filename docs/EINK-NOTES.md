@@ -1,6 +1,6 @@
 # E-ink fork — engineering notes
 
-Last updated: 2026-08-03 05:03 PM CDT
+Last updated: 2026-09-17 07:04 AM CDT
 
 Working notes for the `eink` branch of `CR0CKER/android-chess`, a fork of
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess) (MIT) adapted for
@@ -81,6 +81,8 @@ path; pieces route into it too.
 **Board squares are mid-grey and white, not black and white.** Alpha black pieces are
 solid `#101010` with no light outline, so they vanish against a near-black square. The
 dark square is `#9e9e9e` (`ColorSchemes.EINK[0]`, kept in step with `@color/einkBoardDark`).
+`EINK` is index **10**: upstream 10.4.0 took 9 for its Custom scheme, and the saved
+`colorscheme` preference is a positional index into the dropdown.
 
 **Alpha is the only usable piece set** — the only flat, gradient-free one. Merida uses
 `<aapt:attr>` gradients that `setTint` cannot flatten.
@@ -111,13 +113,13 @@ Settings** and in Board Settings.
 
 | Area | Change |
 |---|---|
-| Input | Tap-to-move; no drag shadow; tapping another own piece re-selects |
+| Input | Tap-to-move; no drag shadow; tapping another own piece re-selects, except a king tap along its rank (castling) |
 | Board | `ColorSchemes.EINK`, Alpha pieces, no tile pattern, no desaturation |
 | Chrome | `ChessThemeEink`/`ChessStartEink`/`ChessDialogThemeEink`, black-and-white only |
 | Buttons | Icon buttons white + black outline; text buttons black + white label; toggles invert |
 | Switches | Explicit outlined track/thumb drawables, not tints |
 | Panes | Outline (`eink_pane_border`) instead of translucent fill, via `?attr/paneBackground` |
-| Animation | No indeterminate progress bar, no pulse, no RecyclerView item animators, no ripples |
+| Animation | No piece-move animation, no indeterminate progress bar, no pulse, no RecyclerView item animators, no ripples |
 | Text churn | Clock and engine score only `setText` on change; engine PV balloon suppressed |
 | Layout | Fullscreen (status bar hidden); minimal controls forced on |
 
@@ -147,6 +149,17 @@ Each of these cost at least one build cycle.
   A style intended for use via `style=` should therefore declare no `layout_*` items at
   all — which is why `ChessToggleButton` exists as a copy of `ChessButton` without them.
 - **`--` is illegal inside an XML comment** and fails the resource merger.
+- **`moveToPositions` is only filled when "Show moves" is on**, and only for the side to
+  move. Never use it to decide whether a tap is legal: the re-select shortcut once did,
+  which made castling onto one's own rook impossible with dots off. Use
+  `getSelectableColor()` rather than `jni.getTurn()` for "whose piece is this" — Lichess
+  pre-moves select pieces while it is the opponent's turn.
+- **Upstream keeps some files CRLF** (`GamesListActivity.java`, `ICSChatDlg.java`,
+  `savegame.xml`, `styles.xml`, `gradlew.bat`). An editor that normalises to LF turns a
+  one-line change into a whole-file diff. Check with `grep -c $'\r$'` before committing.
+- **New upstream layouts bring back `style="@style/ChessButton"`**, which bypasses the
+  e-ink theme. After every upstream sync: `git grep 'style="@style/Chess' -- 'app/src/main/res/layout*'`
+  must print nothing.
 - **R classes are non-transitive** (AGP default), so library attributes such as
   `colorPrimary` are absent from the app's compile-time `R` even though they exist in the
   merged resource table. Resolve them at runtime with `getIdentifier`.
@@ -206,10 +219,14 @@ first.
 
 - The button defect above.
 - **`perf/board-diff`** — `rebuildBoard()` destroys and recreates every piece view on
-  every move. A diffing rewrite exists at commit `728601c` on that branch, reverted from
+  every move (still true in 10.4.0). A diffing rewrite exists at commit `728601c` on that branch, reverted from
   `eink` because no flicker is observable on the Poke3 and the change is high-risk across
   seven call sites with no local test capability.
-- Screens never exercised in e-ink mode: Lichess, ICS, hotspot board, PGN tools.
+- Screens never exercised in e-ink mode: Lichess (including the Swiss/Teams screens added
+  in 10.4.0, whose loading spinners are still indeterminate), ICS, hotspot board, PGN tools.
+- **Rebased onto upstream 10.4.0 on 2026-09-17, not yet device-tested.** Re-test tap moves,
+  castling (standard and Chess960) with "Show moves" both on and off, and toggling the mode
+  from Board Settings.
 - `res/anim/` is dead (nothing references `R.anim.*`), left in place to keep the upstream
   diff small.
 - `PlayActivity.onResume` ends with `postDelayed(this::updateGUI, 1000)`. This is the
