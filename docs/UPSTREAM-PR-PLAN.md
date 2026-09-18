@@ -1,6 +1,6 @@
 # Upstream contribution plan
 
-Last updated: 2026-09-18 05:58 AM CDT
+Last updated: 2026-09-18 11:15 AM CDT
 
 How to get work from this fork into
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess). Written while the
@@ -61,14 +61,39 @@ form:* the `eink` branch uses `?attr/` only for image and toggle buttons, and st
 `style=` from text buttons (see `attrs.xml` and `EINK-NOTES.md` → *The unsolved button
 defect*, where `?attr/` resolution was later ruled out as the cause).
 
+**Second exchange (2026-09-18).** jcarolus: device is a **BOOX Go 6 (Gen II)** (Onyx, so on
+our vendor list); the `?attr/` style change is accepted ("that cleans up the `style` in
+the templates"); asked whether anything beyond "animate pieces", piece set and a new
+disable-drag setting is needed.
+
+Our reply (16:15 UTC):
+
+- **Proposes keeping auto-enable** after all: on recognised e-ink devices the mode (the
+  preset) switches on automatically, and the user can turn it off entirely or turn
+  individual features back on. A fully manual preset is offered as the alternative, and we
+  asked whether auto-enable is OK. Note the maintainer's own device would be caught, so
+  expect a real opinion on this.
+- **Settings proposed:** three new ones — *disable drag*, *e-ink theme* (black-and-white
+  screens and dialogs, outlined buttons and panes, no ripples; next to night mode) and
+  *reduce animations* (engine progress bar, button pulse, list item animations). Plus a
+  new greyscale entry in the colour-scheme list. Everything else reuses existing
+  settings: `pref_use_piece_animation` off, `pieceset` = Alpha, `fullScreen`, `minimal`.
+- **Preset:** switches all of these on in one go; each stays individually changeable.
+- **PR order proposed:** small PRs (Gradle wrapper, CI, clock) → `?attr/` style change →
+  settings + preset.
+
+The tap-to-reselect behaviour belongs to *disable drag*; the info-balloon suppression and
+hidden empty captured-piece slots belong to *reduce animations* and the *e-ink theme*
+respectively (mapping from the `EinkMode.isEnabled()` call sites on `eink`).
+
 **Still open, to decide before any feature PR:**
 
+- Auto-enable vs. manual — waiting on the maintainer.
 - Whether the fork's `eink` branch is reworked onto the settings-plus-preset model or an
   upstream-only branch is built alongside it.
-- How the preset behaves: one-shot apply, or a switch that restores previous values.
-- Which e-ink behaviours need *new* settings (tap-only moves, the black-and-white theme,
-  the other animations) versus reusing existing ones (`pref_use_piece_animation`,
-  `pieceset`, `colorscheme`, `fullScreen`, `minimal`, `showMoves`).
+- How the preset behaves once applied: one-shot apply, or a switch that restores previous
+  values. With auto-enable, turning individual features back on must survive restarts,
+  so the detection must only apply the preset once (first launch), never re-apply it.
 
 **Can go now, independent of the above:** Tier 1 items — the Gradle wrapper, the clock
 guard and CI are explicitly welcomed; `onDraw` and `showMoves` were not commented on.
