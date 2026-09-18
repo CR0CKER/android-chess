@@ -1,6 +1,6 @@
 # Upstream contribution plan
 
-Last updated: 2026-09-17 02:44 PM CDT
+Last updated: 2026-09-18 05:58 AM CDT
 
 How to get work from this fork into
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess). Written while the
@@ -34,29 +34,51 @@ only then prepare a PR. Tier 3 below is fork-only *unless* the maintainer says y
 
 ## Where this stands
 
-**Waiting on a reply to [issue #241](https://github.com/jcarolus/android-chess/issues/241)**
-(opened 2026-09-17, "FEATURE REQUEST: E-ink mode for e-paper Android devices"). It asks
-three questions: whether the feature is wanted at all, whether it should default on via
-vendor detection, and whether converting layouts from `style="@style/ChessButton"` to
-theme attributes is acceptable. It also lists the Tier 1 fixes as separately sendable.
-Two Poke3 screenshots are attached.
+**[Issue #241](https://github.com/jcarolus/android-chess/issues/241) answered
+2026-09-18; our reply to point 3 is posted, waiting on theirs.** The issue asked three
+questions: is an e-ink mode wanted, should it default on via vendor detection, and is
+converting layouts from `style="@style/ChessButton"` to theme attributes acceptable.
+
+**Maintainer's answer (jcarolus, 2026-09-18):**
+
+1. **Wanted:** PRs are judged on benefit, and this one "looks like it will be" beneficial.
+2. **Separate settings, not one mode.** Their own e-reader refreshes fast; they would keep
+   dragging and maybe another piece set. They suggested a **master "e-ink preset" switch
+   that sets the existing switches** (e.g. `pref_use_piece_animation`, `pieceset`) to
+   e-ink-friendly values. So the forcing `EinkMode` design does not go upstream as is, and
+   **vendor auto-detect is out** of the upstream version.
+3. **Unclear to them** — "once point 3 is a bit more clear lets talk PR".
+
+Also explicitly welcomed: the clock-tick guard, the Gradle wrapper and the GitHub Actions
+workflow.
+
+**Our reply to point 3 (2026-09-18):** explained that an explicit `style=` bypasses the
+theme (91 buttons in 22 layouts: 65 `ChessButton`, 26 `ChessImageButton`), and proposed
+the narrow fix: `style="?attr/chessButtonStyle"` / `?attr/chessImageButtonStyle`, mapped
+to the existing styles in every current theme. One line per button, plus `attrs.xml` and
+`themes.xml`, no Java. Also asked which device they use. *Not yet built in the all-`?attr`
+form:* the `eink` branch uses `?attr/` only for image and toggle buttons, and strips
+`style=` from text buttons (see `attrs.xml` and `EINK-NOTES.md` → *The unsolved button
+defect*, where `?attr/` resolution was later ruled out as the cause).
+
+**Still open, to decide before any feature PR:**
+
+- Whether the fork's `eink` branch is reworked onto the settings-plus-preset model or an
+  upstream-only branch is built alongside it.
+- How the preset behaves: one-shot apply, or a switch that restores previous values.
+- Which e-ink behaviours need *new* settings (tap-only moves, the black-and-white theme,
+  the other animations) versus reusing existing ones (`pref_use_piece_animation`,
+  `pieceset`, `colorscheme`, `fullScreen`, `minimal`, `showMoves`).
+
+**Can go now, independent of the above:** Tier 1 items — the Gradle wrapper, the clock
+guard and CI are explicitly welcomed; `onDraw` and `showMoves` were not commented on.
 
 Branch state: `eink` is rebased onto upstream `4be3f52` (10.4.0), CI green, and tested on
-the Poke3 — normal play is good. Pre-rebase history is at tag `eink-pre-sync-2026-09-17`,
-on the fork as well as locally.
-
-**What to do when the maintainer answers:**
-
-| Answer | Next step |
-|---|---|
-| Yes to e-ink mode | Split into reviewable PRs: Tier 1 items first as their own PRs, then the feature itself. Do **not** offer the whole branch as one PR. |
-| Yes, but default off | Drop `EinkMode.defaultEnabled()` back to `false` and leave `isEinkHardware()` unused or out; everything else stands. |
-| No to the layout churn | The theme cannot reach buttons carrying an explicit `style=`. Either the feature is fork-only, or it needs a narrower mechanism agreed with the maintainer first. |
-| No / no reply | Still send Tier 1 as small independent PRs; they stand on their own. Keep e-ink fork-only. |
+the Poke3. Pre-rebase history is at tag `eink-pre-sync-2026-09-17`, on the fork as well as
+locally.
 
 **Positions taken in #241, for consistency if it turns into a discussion:**
 
-- Vendor-list auto-enable is *proposed*, with "off by default" offered as a fallback.
 - The solid-black text buttons are deliberately not raised. They are a workaround for an
   unexplained rendering defect (see `EINK-NOTES.md`), the fork owner is happy with them,
   and they are not load-bearing for the request.
@@ -103,7 +125,7 @@ Replaced with the official 9.1.0 jar, sha256
 `gradlew.bat` come from the same `v9.1.0` tag; `gradlew.bat` must keep upstream's CRLF line
 endings (the content is otherwise identical to Gradle's).
 
-*Strongest candidate — a pure supply-chain fix with an externally verifiable checksum.*
+*Welcomed in #241. Strongest candidate — a pure supply-chain fix with an externally verifiable checksum.*
 
 ### 2. `getHightlightColor()` ignores its own table
 
@@ -140,21 +162,20 @@ both `false`; that contradicted upstream's intent and was reversed.)
 clock redraws were redundant. Same guard for the engine evaluation. Both now only call
 `setText` when the string actually changes.
 
-*Extract from `e25bd60` — take the guards, not the e-ink balloon suppression.*
+*Welcomed in #241. Extract from `e25bd60` — take the guards, not the e-ink balloon suppression.*
+
+### 6. CI workflow — `19d77f3` + `834e620`
+
+`.github/workflows/build.yml` builds `assembleFossDebug` and uploads the APK.
+Welcomed by the maintainer in #241 (2026-09-18); upstream issue **#198** had asked about
+CI/CD adoption too. Reference both in the PR.
+
+Note it must accept SDK licences before installing the NDK, or `sdkmanager` stalls on an
+interactive prompt and the build later fails with `LicenceNotAcceptedException`.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
 ## Tier 2 — plausible, needs discussion
-
-### CI workflow — `19d77f3` + `834e620`
-
-`.github/workflows/build.yml` builds `assembleFossDebug` and uploads the APK.
-Upstream issue **#198** asked about CI/CD adoption, so there is prior interest. Open as a
-question referencing that issue rather than an unsolicited PR — a maintainer may have
-opinions about Actions minutes and secrets.
-
-Note it must accept SDK licences before installing the NDK, or `sdkmanager` stalls on an
-interactive prompt and the build later fails with `LicenceNotAcceptedException`.
 
 ### Diff-based `rebuildBoard` — branch `perf/board-diff`, commit `728601c`
 
