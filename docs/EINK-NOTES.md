@@ -78,9 +78,10 @@ and smears. Tap-to-move costs two panel updates per move instead of hundreds. Th
 select/move machinery (`selectPosition`/`handleMove`) already existed for the square-click
 path; pieces route into it too.
 
-**Board squares are mid-grey and white, not black and white.** Alpha black pieces are
+**Board squares are light grey and white, not black and white.** Alpha black pieces are
 solid `#101010` with no light outline, so they vanish against a near-black square. The
-dark square is `#9e9e9e` (`ColorSchemes.EINK[0]`, kept in step with `@color/einkBoardDark`).
+dark square is `#bbbbbb` (`ColorSchemes.EINK[0]`, kept in step with `@color/einkBoardDark`),
+lightened from `#9e9e9e` on 2026-09-19 because black pieces were hard to see on it.
 `EINK` is index **10**: upstream 10.4.0 took 9 for its Custom scheme, and the saved
 `colorscheme` preference is a positional index into the dropdown.
 

@@ -87,12 +87,11 @@ public class ColorSchemes {
         //
         // Squares are opaque (the colour schemes above are 0xee, which washes
         // out on a reflective panel) and sit at levels an e-ink controller can
-        // hold cleanly. The dark square is deliberately mid-grey rather than
-        // near-black: Alpha black pieces are solid #101010 with no light
-        // outline, so they would disappear against a black square.
-        // Kept in step with @color/einkBoardDark, which tints switch tracks and
-        // selected toggles so "active" reads the same everywhere.
-        colorScheme[EINK][0] = 0xff9e9e9e; // dark square
+        // hold cleanly. The dark square is deliberately a light grey (#bbbbbb,
+        // one of the 16 panel levels) rather than anything darker: Alpha black
+        // pieces are solid #101010 with no light outline, so they lose contrast
+        // against a dark square. Kept in step with @color/einkBoardDark.
+        colorScheme[EINK][0] = 0xffbbbbbb; // dark square
         colorScheme[EINK][1] = 0xffffffff; // light square
         colorScheme[EINK][2] = 0xff4d4d4d; // selected square
         colorScheme[EINK][3] = 0x40000000; // last-move wash, darkens either square
