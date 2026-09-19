@@ -8,14 +8,17 @@
     <attr name="paneBackground" format="reference|color" />
 
     <!--
-        Image-button style as a theme attribute, so e-ink can swap in a flat
-        outlined variant without touching every layout.
+        Button styles as theme attributes. An explicit style="@style/ChessButton"
+        on a button always wins over the theme, so the e-ink theme could not
+        restyle it; style="?attr/chessButtonStyle" resolves through the theme
+        instead. The colour themes map these to the same styles the layouts
+        used to name directly, so their look is unchanged.
 
-        There is deliberately no chessButtonStyle twin. Text buttons referencing
-        one via style="?attr/..." rendered black on black in e-ink mode even when
-        the referenced style was colour-identical to this one; they take the
-        theme's materialButtonStyle instead, which is observed to work.
+        Text buttons once rendered black on black in the e-ink theme when styled
+        this way; that was later traced away from ?attr/ resolution itself (see
+        docs/EINK-NOTES.md, "The unsolved button defect").
     -->
+    <attr name="chessButtonStyle" format="reference" />
     <attr name="chessImageButtonStyle" format="reference" />
 
     <!-- Toggle group children, which need to invert to show selection. -->

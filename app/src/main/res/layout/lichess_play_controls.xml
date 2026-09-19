@@ -53,8 +53,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_margin="1dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonDraw"
@@ -63,8 +62,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_margin="1dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
         </LinearLayout>
 
         <LinearLayout
@@ -79,8 +77,7 @@
                 android:text="@string/puzzle_show"
                 android:layout_width="wrap_content"
                 android:layout_margin="1dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
 
             <View
                 android:layout_width="0dp"
@@ -117,8 +114,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_margin="1dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonConfirmMove"
@@ -127,8 +123,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_margin="1dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
         </LinearLayout>
 
         <LinearLayout
@@ -145,8 +140,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_margin="1dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/ButtonSaveToDatabase"
@@ -155,8 +149,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_margin="1dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
         </LinearLayout>
 
         <com.google.android.flexbox.FlexboxLayout

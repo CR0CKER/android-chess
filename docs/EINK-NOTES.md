@@ -180,7 +180,7 @@ Each of these cost at least one build cycle.
   `savegame.xml`, `styles.xml`, `gradlew.bat`). An editor that normalises to LF turns a
   one-line change into a whole-file diff. Check with `grep -c $'\r$'` before committing.
 - **New upstream layouts bring back `style="@style/ChessButton"`**, which bypasses the
-  e-ink theme. After every upstream sync: `git grep 'style="@style/Chess' -- 'app/src/main/res/layout*'`
+  e-ink theme — use `?attr/chessButtonStyle` / `?attr/chessImageButtonStyle` instead. After every upstream sync: `git grep 'style="@style/Chess' -- 'app/src/main/res/layout*'`
   must print nothing.
 - **R classes are non-transitive** (AGP default), so library attributes such as
   `colorPrimary` are absent from the app's compile-time `R` even though they exist in the
@@ -232,6 +232,13 @@ background tint reaches the drawable and is never painted.
 **Falsified on-device, in order:** the dialog-vs-activity context; `?attr/` style
 resolution; resource-qualifier shadowing; the parent style; style duplication;
 `colorPrimary`; and zeroed insets. None was the cause.
+
+**Text buttons back on `?attr/` (2026-09-19).** As proposed to the maintainer in #241,
+all 91 buttons in the 22 upstream layouts now use `style="?attr/chessButtonStyle"` or
+`?attr/chessImageButtonStyle` — a one-line swap of upstream's `@style/ChessButton` /
+`@style/ChessImageButton`, with the inlined height/margin stopgaps removed (the style
+supplies them again). Not yet device-tested: if text buttons go black-on-black in a way
+that differs from the known defect below, revert that commit on its own.
 
 **Current resolution.** The black is made *intentional* — `ChessButtonEink` is solid
 black with a white label — so it is readable regardless. Toggle-group children render

@@ -31,9 +31,8 @@
                 android:text="@string/lichess_lobby_button_logout"
                 android:id="@+id/ButtonLogout"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/imageButtonSize"
-                android:layout_margin="4dip"
-                />
+
+                style="?attr/chessButtonStyle" />
         </TableRow>
     </TableLayout>
 
@@ -66,32 +65,28 @@
                 android:id="@+id/ButtonChallenge"
                 android:layout_width="wrap_content"
                 android:layout_marginTop="8dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
 
             <com.google.android.material.button.MaterialButton
                 android:text="@string/lichess_lobby_button_seek"
                 android:id="@+id/ButtonSeek"
                 android:layout_width="wrap_content"
                 android:layout_marginTop="8dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
 
             <com.google.android.material.button.MaterialButton
                 android:text="@string/lichess_lobby_button_puzzle"
                 android:id="@+id/ButtonPuzzle"
                 android:layout_width="wrap_content"
                 android:layout_marginTop="8dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
 
             <com.google.android.material.button.MaterialButton
                 android:text="@string/lichess_lobby_button_teams"
                 android:id="@+id/ButtonTeams"
                 android:layout_width="wrap_content"
                 android:layout_marginTop="8dip"
-                android:layout_height="@dimen/imageButtonSize"
-                />
+                style="?attr/chessButtonStyle" />
 
         </com.google.android.flexbox.FlexboxLayout>
 
