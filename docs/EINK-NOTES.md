@@ -1,6 +1,6 @@
 # E-ink fork — engineering notes
 
-Last updated: 2026-09-19 03:13 AM CDT
+Last updated: 2026-09-19 05:09 AM CDT
 
 Working notes for the `eink` branch of `CR0CKER/android-chess`, a fork of
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess) (MIT) adapted for
@@ -263,12 +263,16 @@ first.
   seven call sites with no local test capability.
 - Screens never exercised in e-ink mode: Lichess (including the Swiss/Teams screens added
   in 10.4.0, whose loading spinners are still indeterminate), ICS, hotspot board, PGN tools.
-- **Settings-plus-preset rework (2026-09-19) is CI-built only**, not yet device-tested.
-  Checklist: fresh install (uninstall first — an old install has `einkMode=true` but none
-  of the new keys, so it comes up in colour; switching e-ink off and on once fixes it)
+- **Settings-plus-preset rework device-tested on the Poke3, 2026-09-19** (build `4d096ea`,
+  with the Game settings switch removed): all checks passed. Those were: a fresh install
   comes up in e-ink; change the piece set, switch e-ink off → piece set stays, the rest
   reverts; switch on again; re-enable dragging with e-ink on; back in the play screen after
-  switching → it restyles and minimal controls follow; normal play, undo, flip, castling with dots off.
+  switching → it restyles and minimal controls follow; text buttons; normal play, undo,
+  flip, castling with dots off. The dark square was lightened to `#bbbbbb` during this
+  test. Upgrading over an old install leaves `einkMode=true` with none of the new keys,
+  so it comes up in colour; uninstall first, or switch e-ink off and on once.
+- **Upstream as [#244](https://github.com/jcarolus/android-chess/pull/244)** (open,
+  2026-09-19). Status and next steps: `UPSTREAM-PR-PLAN.md` → *Where this stands*.
 - **Rebased onto upstream 10.4.0 and device-tested on the Poke3, 2026-09-17** — normal play
   is good. Not individually confirmed yet: Chess960 castling with "Show moves" off, and the
   Lichess Swiss/Teams screens added in 10.4.0.

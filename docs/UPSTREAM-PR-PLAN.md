@@ -1,6 +1,6 @@
 # Upstream contribution plan
 
-Last updated: 2026-09-19 03:14 AM CDT
+Last updated: 2026-09-19 05:08 AM CDT
 
 How to get work from this fork into
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess). Written while the
@@ -35,9 +35,17 @@ only then prepare a PR. Tier 3 below is fork-only *unless* the maintainer says y
 
 ## Where this stands
 
-**[Issue #241](https://github.com/jcarolus/android-chess/issues/241): the feature is
-agreed (2026-09-18) and the first PRs are being prepared** — details at the end of this
-section, the exchanges in order below. The issue asked three
+**Three PRs are open (2026-09-19), waiting for the maintainer to merge or comment:**
+
+| PR | Branch (on the fork) | What | Notes |
+|---|---|---|---|
+| [#242](https://github.com/jcarolus/android-chess/pull/242) | `fix/gradle-wrapper` | Gradle 1.6 snapshot wrapper → official 9.1.0 | 3 files; merges cleanly with the others |
+| [#243](https://github.com/jcarolus/android-chess/pull/243) | `perf/clock-settext-guard` | Clock and engine score only redraw on change | 1 file; **conflicts with #244** in `PlayActivity.OnEngineInfo()` |
+| [#244](https://github.com/jcarolus/android-chess/pull/244) | `feat/eink-settings` | The e-ink feature: three settings, greyscale scheme, preset, auto-enable, `?attr/` button styles, minimal-controls fix | 56 files, one commit; device-tested on the Poke3 |
+
+See *What to do when the maintainer responds* at the end of this section. The feature
+itself was agreed in [issue #241](https://github.com/jcarolus/android-chess/issues/241)
+(2026-09-18); the exchanges are below, in order. The issue asked three
 questions: is an e-ink mode wanted, should it default on via vendor detection, and is
 converting layouts from `style="@style/ChessButton"` to theme attributes acceptable.
 
@@ -101,12 +109,30 @@ auto-detection. I'll keep an eye out for the PR's"*. Everything proposed is agre
 - PRs: Gradle wrapper and clock guard as their own small PRs; the `?attr/` style change
   and the settings plus preset together as **one feature PR**.
 
-**PR status (2026-09-19):** `fix/gradle-wrapper` and `perf/clock-settext-guard` are
-prepared on the fork, each one commit off `upstream/master`, and built green by CI via
-throwaway `ci/*` branches (upstream has no workflow). PR text awaits approval before
-opening. The clock branch only builds on CI together with the wrapper fix: upstream's
-2013 snapshot jar fails `setup-gradle`'s wrapper validation — independent confirmation
-of the wrapper PR.
+**How the PRs were built (2026-09-19):**
+
+- Each is one commit on a fresh branch off `upstream/master`, pushed to the fork with
+  tracking set (`origin/<branch>`).
+- #244 is `eink`'s tree minus everything that isn't the feature: `.github/`, `docs/`, the
+  wrapper (#242), the clock guard (#243), the `showMoves` default and the `onDraw` changes
+  (both later PRs). `git diff eink feat/eink-settings` (ignoring those paths) shows only
+  those four files.
+- The highlight-colour table (Tier 1 item 2) went into #244 rather than its own PR: the
+  greyscale scheme needs per-scheme highlight and coordinate colours.
+- The minimal-controls fix (last-move text `INVISIBLE`, not `GONE`) is in #244 and named
+  in its description.
+- The black text buttons are raised in #244 as a known quirk, asking whether the
+  maintainer knows the cause.
+- Every PR text was approved by Nils before opening. #242 and #243 end with the default
+  "🤖 Generated with Claude Code" line; from #244 on, PRs end with exactly "Developed with
+  the assistance of Claude Code." (no link) — see `~/.claude/CLAUDE.md`.
+- CI: upstream has no workflow, so each branch was built on the fork via a throwaway
+  `ci/<name>` branch (see *Mechanics*). Runs:
+  [#242](https://github.com/CR0CKER/android-chess/actions/runs/35431189386),
+  [#243](https://github.com/CR0CKER/android-chess/actions/runs/35431220654),
+  [#244](https://github.com/CR0CKER/android-chess/actions/runs/35436183977). Upstream's
+  own 2013 wrapper jar fails `setup-gradle`'s wrapper validation, so #243 and #244 only
+  build on CI together with the #242 fix.
 
 Branch state: `eink` is rebased onto upstream `4be3f52` (10.4.0), CI green, and tested on
 the Poke3. Pre-rebase history is at tag `eink-pre-sync-2026-09-17`, on the fork as well as
@@ -114,12 +140,26 @@ locally.
 
 **Positions taken in #241, for consistency if it turns into a discussion:**
 
-- The solid-black text buttons are deliberately not raised. They are a workaround for an
-  unexplained rendering defect (see `EINK-NOTES.md`), the fork owner is happy with them,
-  and they are not load-bearing for the request.
+- The solid-black text buttons were not raised in #241, but are raised in #244 as a
+  known quirk (a workaround for an unexplained rendering defect, see `EINK-NOTES.md`).
 - Every claim in the issue is verifiable: the Gradle wrapper snapshot, the `onDraw`
   allocations, the `showMoves` mismatch and the clock ticks were all re-checked against
   `upstream/master` on 2026-09-17.
+
+**What to do when the maintainer responds:**
+
+| Event | Next step |
+|---|---|
+| #243 or #244 merged | Rebase the other onto the new `upstream/master`, resolve `OnEngineInfo()` (keep both the `setText` guard and the `isReduceAnimations()` balloon condition), build via a `ci/` branch, force-push its branch. Its description already announces this. |
+| Any PR merged | Delete its branch on the fork (`git push origin --delete <branch>`) and locally. Then sync `eink` (below). |
+| Review comments | Answer or fix each one. Draft replies for Nils's approval before posting; if a fix adds a commit, update the PR description in the same pass. |
+| All three merged | Send the remaining Tier 1 items as small PRs: `onDraw` allocations (item 3), `showMoves` default (item 4), CI workflow (item 6). |
+
+**Syncing `eink` after a merge:** `git fetch upstream && git rebase upstream/master` on
+`eink`. The merged changes already exist on `eink` as different commits (and a squash
+merge changes the SHAs), so expect conflicts or empty commits. Resolve them in upstream's
+favour, then re-run the after-sync checks in `CLAUDE.md`. `eink`'s own `OnClockTime()`
+comment differs slightly from #243's; take #243's.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
@@ -160,7 +200,7 @@ Replaced with the official 9.1.0 jar, sha256
 `gradlew.bat` come from the same `v9.1.0` tag; `gradlew.bat` must keep upstream's CRLF line
 endings (the content is otherwise identical to Gradle's).
 
-*Welcomed in #241. Strongest candidate — a pure supply-chain fix with an externally verifiable checksum.*
+*Welcomed in #241. **Opened as [#242](https://github.com/jcarolus/android-chess/pull/242) (2026-09-19).***
 
 ### 2. `getHightlightColor()` ignores its own table
 
@@ -171,7 +211,7 @@ per-scheme values stay unused. Upstream it is a tidy-up with no visible effect, 
 bug fix — the weakest item here; only worth sending if the maintainer wants
 per-scheme highlights.
 
-*Extract from `1c6ec43`; do not bring the e-ink scheme row with it.*
+*No separate PR: folded into [#244](https://github.com/jcarolus/android-chess/pull/244), which needs per-scheme highlight and coordinate colours for the greyscale scheme.*
 
 ### 3. `onDraw` allocations — `56fc5fa`
 
@@ -180,7 +220,7 @@ repaint (twice: tile pattern and D-pad focus ring) and allocated two `Rect`s.
 `ChessPieceLabelView.onDraw` called `setTextSize` unconditionally, which requests a layout
 and invalidates — a draw scheduling another draw.
 
-*Pure performance, no visual change, benefits every device.*
+*Pure performance, no visual change, benefits every device. **Next small PR**, once the open three are through.*
 
 ### 4. `showMoves` default mismatch — `22abcea`
 
@@ -197,13 +237,14 @@ both `false`; that contradicted upstream's intent and was reversed.)
 clock redraws were redundant. Same guard for the engine evaluation. Both now only call
 `setText` when the string actually changes.
 
-*Welcomed in #241. Extract from `e25bd60` — take the guards, not the e-ink balloon suppression.*
+*Welcomed in #241. **Opened as [#243](https://github.com/jcarolus/android-chess/pull/243) (2026-09-19).***
 
 ### 6. CI workflow — `19d77f3` + `834e620`
 
 `.github/workflows/build.yml` builds `assembleFossDebug` and uploads the APK.
 Welcomed by the maintainer in #241 (2026-09-18); upstream issue **#198** had asked about
-CI/CD adoption too. Reference both in the PR.
+CI/CD adoption too. Reference both in the PR. Not opened yet; send after #242, since the
+workflow cannot pass with the old wrapper jar.
 
 Note it must accept SDK licences before installing the NDK, or `sdkmanager` stalls on an
 interactive prompt and the build later fails with `LicenceNotAcceptedException`.
@@ -231,8 +272,8 @@ castling, Chess960 and duck chess.
 ### Tap-to-move as an accessibility option
 
 Independent of e-ink, this helps anyone who finds dragging hard, and relates to closed
-issues **#207** ("Point and move") and **#211** (accessibility). Would need reframing as a
-general preference rather than an e-ink side effect.
+issues **#207** ("Point and move") and **#211** (accessibility). **Now a general setting
+("Tap to move") in #244**, so no separate PR is needed.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
@@ -247,22 +288,40 @@ Still fork-only:
 
 - `docs/EINK-NOTES.md` and this file.
 - The solid-black text buttons (`ChessButtonEink`) are a workaround for an unexplained
-  rendering defect, not a fix. Raise it in the feature PR rather than hide it.
+  rendering defect, not a fix. Raised in #244 as a known quirk.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
 ## Mechanics
 
+The procedure used for #242–#244 (2026-09-19):
+
 ```bash
 git fetch upstream
-git checkout -b upstream/gradle-wrapper upstream/master
-git cherry-pick 2c27d51
-# build check: push and let this fork's CI run it, since there is no local toolchain
-git push -u origin upstream/gradle-wrapper
-gh pr create -R jcarolus/android-chess --base master \
-  --title "build: replace 2013 Gradle 1.6 snapshot wrapper with official 9.1.0" \
-  --body-file /tmp/pr-body.md
+git switch -c fix/thing upstream/master     # fix/, perf/, feat/ prefixes
+# bring the change over: cherry-pick, or `git checkout eink -- <files>` and trim by hand
+git commit                                  # Conventional Commit, Co-Authored-By trailer
+
+# CI check: upstream has no workflow and the PR branch must not gain one, so build a
+# throwaway branch = PR commit + the #242 wrapper fix + the workflow with "ci/**" added
+# to its push trigger (a push event reads the workflow from the pushed commit).
+git switch -c ci/thing fix/thing
+git cherry-pick -x 823ba7c                  # wrapper fix, until #242 is merged
+git checkout eink -- .github/workflows/build.yml
+sed -i 's/branches: \[eink, master\]/branches: [eink, master, "ci\/**"]/' .github/workflows/build.yml
+git add .github/workflows/build.yml         # the sed edit must be staged, or the push builds nothing
+git commit -m "ci: throwaway build of fix/thing"
+git push -f origin ci/thing                 # wait for green, then delete the branch
+
+git push -u origin fix/thing
+# draft title + body, Nils approves the exact text, then:
+gh pr create -R jcarolus/android-chess --base master --head CR0CKER:fix/thing \
+  --title "<approved title>" --body-file <approved body>
+git push origin --delete ci/thing && git branch -D ci/thing
 ```
+
+Before committing on a PR branch, check line endings against upstream
+(`grep -c $'\r$'`). Several files are CRLF, and `GamesListActivity.java` is mixed.
 
 PR body structure upstream will find easiest to review:
 
@@ -271,8 +330,9 @@ PR body structure upstream will find easiest to review:
 - **Testing** — say plainly that it was built via GitHub Actions and, where relevant, that
   there is no local toolchain; never imply tests were run that were not
 
-Every PR must state that it was verified by a CI build only, since there is no test suite
-to point at.
+Every PR must state how it was verified: a CI build (there is no test suite to point at),
+plus any device testing, naming what was *not* tested. End with exactly "Developed with
+the assistance of Claude Code." (no link).
 
 <sub>[↑ Back to contents](#contents)</sub>
 
