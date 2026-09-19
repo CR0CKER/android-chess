@@ -1,14 +1,15 @@
 # Upstream contribution plan
 
-Last updated: 2026-09-18 11:15 AM CDT
+Last updated: 2026-09-19 03:14 AM CDT
 
 How to get work from this fork into
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess). Written while the
 context is fresh; everything below is verifiable from the branch.
 
-The `eink` branch is **not** an upstream candidate as it stands — it is 41 commits mixing
-a device-specific feature with generic fixes, and it defaults behaviour based on hardware
-detection. Split it.
+The `eink` branch is **not** a PR as it stands — its history mixes the feature with
+generic fixes and diagnostic add/remove pairs. PRs are built on fresh branches off
+`upstream/master`. The feature itself is **agreed with the maintainer** (#241,
+2026-09-18), in the settings-plus-preset form `eink` now implements.
 
 **Order agreed 2026-09-17:** first open a feature request asking whether an e-ink mode
 would be welcome at all, then device-test the branch rebased onto upstream 10.4.0, and
@@ -34,8 +35,9 @@ only then prepare a PR. Tier 3 below is fork-only *unless* the maintainer says y
 
 ## Where this stands
 
-**[Issue #241](https://github.com/jcarolus/android-chess/issues/241) answered
-2026-09-18; our reply to point 3 is posted, waiting on theirs.** The issue asked three
+**[Issue #241](https://github.com/jcarolus/android-chess/issues/241): the feature is
+agreed (2026-09-18) and the first PRs are being prepared** — details at the end of this
+section, the exchanges in order below. The issue asked three
 questions: is an e-ink mode wanted, should it default on via vendor detection, and is
 converting layouts from `style="@style/ChessButton"` to theme attributes acceptable.
 
@@ -86,17 +88,25 @@ The tap-to-reselect behaviour belongs to *disable drag*; the info-balloon suppre
 hidden empty captured-piece slots belong to *reduce animations* and the *e-ink theme*
 respectively (mapping from the `EinkMode.isEnabled()` call sites on `eink`).
 
-**Still open, to decide before any feature PR:**
+**Third exchange (2026-09-18, 18:44 UTC):** jcarolus: *"Ok, agreed on the
+auto-detection. I'll keep an eye out for the PR's"*. Everything proposed is agreed.
 
-- Auto-enable vs. manual — waiting on the maintainer.
-- Whether the fork's `eink` branch is reworked onto the settings-plus-preset model or an
-  upstream-only branch is built alongside it.
-- How the preset behaves once applied: one-shot apply, or a switch that restores previous
-  values. With auto-enable, turning individual features back on must survive restarts,
-  so the detection must only apply the preset once (first launch), never re-apply it.
+**Decided by the fork owner (2026-09-19):**
 
-**Can go now, independent of the above:** Tier 1 items — the Gradle wrapper, the clock
-guard and CI are explicitly welcomed; `onDraw` and `showMoves` were not commented on.
+- `eink` itself is reworked onto the settings-plus-preset model; no separate upstream
+  branch. Done 2026-09-19 (see `EINK-NOTES.md` → *What e-ink mode changes*).
+- Switching the preset off restores the previous values, except settings the user has
+  changed since.
+- Text buttons move to `style="?attr/chessButtonStyle"`, as proposed in #241.
+- PRs: Gradle wrapper and clock guard as their own small PRs; the `?attr/` style change
+  and the settings plus preset together as **one feature PR**.
+
+**PR status (2026-09-19):** `fix/gradle-wrapper` and `perf/clock-settext-guard` are
+prepared on the fork, each one commit off `upstream/master`, and built green by CI via
+throwaway `ci/*` branches (upstream has no workflow). PR text awaits approval before
+opening. The clock branch only builds on CI together with the wrapper fix: upstream's
+2013 snapshot jar fails `setup-gradle`'s wrapper validation — independent confirmation
+of the wrapper PR.
 
 Branch state: `eink` is rebased onto upstream `4be3f52` (10.4.0), CI green, and tested on
 the Poke3. Pre-rebase history is at tag `eink-pre-sync-2026-09-17`, on the fork as well as
@@ -228,16 +238,16 @@ general preference rather than an e-ink side effect.
 
 ## Tier 3 — fork-only
 
-Do not send these. They are device-specific or behaviour-changing:
+Mostly superseded: the maintainer agreed to the feature in #241, so `EinkMode`, the e-ink
+theme/style/drawable set, vendor detection, the greyscale colour scheme and the `?attr/`
+button styles all go into the **feature PR**. Forced minimal, forced fullscreen and the
+forcing of board appearance no longer exist — the preset writes ordinary settings.
 
-- `EinkMode` and the entire e-ink theme/style/drawable set
-- Vendor-based hardware detection and the resulting default
-- Forced minimal controls and forced fullscreen
-- The `ColorSchemes.EINK` row (index 10, after upstream's `CUSTOM_COLOR_SCHEME` 9) and
-  Alpha piece-set forcing
-- Solid-black text buttons (a workaround for an unexplained rendering defect, not a fix)
-- Conversion of `ChessButton`/`ChessImageButton` to theme attributes, and the removal of
-  `style=` from 48 layout buttons — churn that only exists to support e-ink theming
+Still fork-only:
+
+- `docs/EINK-NOTES.md` and this file.
+- The solid-black text buttons (`ChessButtonEink`) are a workaround for an unexplained
+  rendering defect, not a fix. Raise it in the feature PR rather than hide it.
 
 <sub>[↑ Back to contents](#contents)</sub>
 

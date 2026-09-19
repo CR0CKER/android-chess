@@ -141,10 +141,7 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
         final int from = Move.getFrom(move);
         final int to = Move.getTo(move);
         final boolean enteredByDragging = consumeDraggedMove(from, to);
-        // A piece sliding across the board is a quarter second of continuous
-        // partial refreshes on e-ink, which smears exactly like a drag shadow.
-        final boolean usePieceAnimation = getPrefs().getBoolean(PREF_USE_PIECE_ANIMATION, true)
-            && !EinkMode.isEnabled();
+        final boolean usePieceAnimation = getPrefs().getBoolean(PREF_USE_PIECE_ANIMATION, true);
         final ChessPieceView originalPieceView = enteredByDragging || !usePieceAnimation
             ? null
             : getPieceViewOnPosition(from);
@@ -486,8 +483,6 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
         } catch (NumberFormatException ex) {
             Log.e(TAG, ex.getMessage());
         }
-
-        EinkMode.applyBoardAppearance();
 
         PieceSets.selectedBlindfoldMode = PieceSets.BLINDFOLD_SHOW_PIECES;
 
@@ -1307,14 +1302,13 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_ENTERED:
                         // Repainting each square the finger crosses leaves a ghost
-                        // trail on e-ink. Unreachable while e-ink mode disables
-                        // dragging, but kept correct if dragging is re-enabled.
-                        if (!EinkMode.isEnabled()) {
+                        // trail on e-ink.
+                        if (!EinkMode.isReduceAnimations()) {
                             view.setSelected(true);
                         }
                         break;
                     case DragEvent.ACTION_DRAG_EXITED:
-                        if (!EinkMode.isEnabled()) {
+                        if (!EinkMode.isReduceAnimations()) {
                             view.setSelected(false);
                         }
                         break;
@@ -1525,10 +1519,10 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
                     return true;
                 }
-            } else if (EinkMode.isEnabled() && view instanceof ChessPieceView) {
-                // No drag on e-ink: the drag shadow is a translucent surface the
-                // compositor slides at touch frame rate, which smears across the
-                // panel. Tap to select, tap the destination to move.
+            } else if (EinkMode.isDragDisabled() && view instanceof ChessPieceView) {
+                // Tap to move, no drag: the drag shadow is a translucent surface
+                // the compositor slides at touch frame rate, which smears across
+                // an e-ink panel. Tap to select, tap the destination to move.
                 if (action == MotionEvent.ACTION_UP) {
                     ChessBoardActivity.this.selectPosition(((ChessPieceView) view).getPos());
                     return true;
@@ -1701,11 +1695,11 @@ abstract public class ChessBoardActivity extends BaseActivity implements GameLis
                 }
                 updateSelectedSquares();
             } else if (selectedPosition != pos) {
-                if (EinkMode.isEnabled() && isReselectTap(pos)) {
+                if (EinkMode.isDragDisabled() && isReselectTap(pos)) {
                     // Tapping another of your own pieces re-selects it instead of
-                    // attempting an illegal move. Dragging is unavailable on e-ink,
-                    // so the rejected-move detour would cost two more full board
-                    // repaints before the user could try again.
+                    // attempting an illegal move. With tap to move there is no drag
+                    // to fall back on, and the rejected-move detour would cost two
+                    // more full board repaints before the user could try again.
                     selectedPosition = pos;
                     setMoveToPositions(pos);
                     feedbackSelect();

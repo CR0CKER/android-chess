@@ -231,7 +231,7 @@ public class PlayActivity extends ChessBoardActivity implements
         textViewWhitePieces = findViewById(R.id.TextViewWhitePieces);
         textViewBlackPieces = findViewById(R.id.TextViewBlackPieces);
         textViewEngineValue = findViewById(R.id.TextViewEngineValue);
-        if (EinkMode.isEnabled()) {
+        if (EinkMode.isThemeEnabled()) {
             // The evaluation is a bare number; a box around it just adds edges for
             // the panel to render and reads as a control you can press. It carries
             // no textColor of its own, so it also has to be pinned to black rather
@@ -305,9 +305,7 @@ public class PlayActivity extends ChessBoardActivity implements
         flipBoard = prefs.getBoolean("flipBoard", false);
         switchFlip.setChecked(flipBoard);
         switchBlindfold.setChecked(false);
-        // E-ink devices are typically small and tall; the full control stack does
-        // not fit and pushes the board around. Minimal is the sane default there.
-        switchMinimal.setChecked(prefs.getBoolean("minimal", false) || EinkMode.isEnabled());
+        switchMinimal.setChecked(prefs.getBoolean("minimal", false));
         switchMinimal(switchMinimal.isChecked());
         applyCapturedPiecesVisibility();
 
@@ -414,11 +412,7 @@ public class PlayActivity extends ChessBoardActivity implements
         editor.putLong("clockBlackMillies", localClock.getBlackRemaining());
         editor.putLong("clockStartTime", gameApi.isEnded() ? 0 : pauseTime);
         editor.putBoolean("flipBoard", flipBoard);
-        if (!EinkMode.isEnabled()) {
-            // E-ink forces minimal on; don't write that back, or it would stay
-            // stuck on after e-ink mode is switched off again.
-            editor.putBoolean("minimal", switchMinimal.isChecked());
-        }
+        editor.putBoolean("minimal", switchMinimal.isChecked());
 
         editor.commit();
     }
@@ -540,14 +534,14 @@ public class PlayActivity extends ChessBoardActivity implements
         // The local engine reports once a second and an external UCI engine can
         // report many times a second, each rewriting a whole principal variation.
         // Only touch the views when the text actually changes, and leave the
-        // balloon alone on e-ink, where a line of text rewritten mid-search is a
-        // steady stream of panel updates for information that is obsolete by the
-        // time it has finished rendering.
+        // balloon alone with reduced animations, where a line of text rewritten
+        // mid-search is a steady stream of e-ink panel updates for information
+        // that is obsolete by the time it has finished rendering.
         final String scoreText = String.format("%.1f", value);
         if (!scoreText.contentEquals(textViewEngineValue.getText())) {
             textViewEngineValue.setText(scoreText);
         }
-        if (!EinkMode.isEnabled() && textViewInfoBalloon != null && textViewInfoBalloon.getParent() != null) {
+        if (!EinkMode.isReduceAnimations() && textViewInfoBalloon != null && textViewInfoBalloon.getParent() != null) {
             textViewInfoBalloon.setText(message);
         }
     }
@@ -688,7 +682,7 @@ public class PlayActivity extends ChessBoardActivity implements
                 // which on a greyscale panel read as a row of unexplained blocks
                 // rather than as "nothing captured yet". Only show a slot once it
                 // actually holds a piece.
-                if (numCaptured > 0 || !EinkMode.isEnabled()) {
+                if (numCaptured > 0 || !EinkMode.isThemeEnabled()) {
                     ChessSquareView square = new ChessSquareView(this, piece);
                     if (turnAt == BoardConstants.WHITE) {
                         capturedWhitePieces.addView(square);
@@ -741,7 +735,7 @@ public class PlayActivity extends ChessBoardActivity implements
             // The indeterminate bar loops for as long as the engine thinks, which
             // on e-ink is an unbroken refresh cycle. The button icon above
             // already says the engine is busy, so leave the bar hidden.
-            progressBarEngine.setVisibility(EinkMode.isEnabled() ? View.INVISIBLE : View.VISIBLE);
+            progressBarEngine.setVisibility(EinkMode.isReduceAnimations() ? View.INVISIBLE : View.VISIBLE);
         } else {
             playButton.setIconResource(R.drawable.ic_robot);
             progressBarEngine.setVisibility(View.INVISIBLE);
@@ -823,9 +817,12 @@ public class PlayActivity extends ChessBoardActivity implements
                 break;
 
             case REQUEST_GAME_SETTINGS:
-                if (getPrefs().getBoolean(EinkMode.PREF_KEY, EinkMode.defaultEnabled()) != EinkMode.isEnabled()) {
-                    // The theme is chosen in onCreate, so switching needs a fresh
-                    // activity rather than just a redraw.
+                if (data != null && data.getBoolean(GameSettingsDialog.EINK_PRESET_CHANGED, false)) {
+                    // The preset may change the theme, which is chosen in onCreate,
+                    // so this needs a fresh activity rather than just a redraw.
+                    // onPause writes "minimal" from the switch, so bring the switch
+                    // in line with the preset first or the old value wins.
+                    switchMinimal.setChecked(getPrefs().getBoolean("minimal", false));
                     recreate();
                     return;
                 }

@@ -33,7 +33,7 @@ public class SaveGameDialog extends Dialog {
     private OnResultListener onResultListener;
 
     public SaveGameDialog(@NonNull Context context, GameApi gameApi, long lGameID, OnResultListener onResult) {
-        super(context, EinkMode.isEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
+        super(context, EinkMode.isThemeEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
 
         this.gameApi = gameApi;
         result = new SaveGameResult();

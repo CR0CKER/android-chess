@@ -565,7 +565,7 @@ public class GamesListActivity extends ChessBoardActivity {
 
     private class FilterDialog extends Dialog {
         public FilterDialog(@NonNull Context context) {
-            super(context, EinkMode.isEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
+            super(context, EinkMode.isThemeEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
 
             setContentView(R.layout.gameslist_filters);
         }

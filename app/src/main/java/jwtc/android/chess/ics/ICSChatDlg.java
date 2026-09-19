@@ -21,7 +21,7 @@ public class ICSChatDlg extends Dialog {
     private EditText _editChat;
 
     public ICSChatDlg(Context context) {
-        super(context, EinkMode.isEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
+        super(context, EinkMode.isThemeEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
 
         _parent = (ICSClient) context;
 

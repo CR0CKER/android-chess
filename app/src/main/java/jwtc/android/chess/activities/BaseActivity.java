@@ -37,6 +37,7 @@ import jwtc.chess.PGNColumns;
 public class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";
     private AccessibilityManager am;
+    private boolean createdWithEinkTheme;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,8 +45,10 @@ public class BaseActivity extends AppCompatActivity {
         // resolves theme attributes while creating its delegate, so a theme set
         // afterwards is only partly honoured and widget styles from the previous
         // theme survive a recreate().
+        EinkMode.ensureInitialised(getPrefs());
         EinkMode.load(getPrefs());
-        if (EinkMode.isEnabled()) {
+        createdWithEinkTheme = EinkMode.isThemeEnabled();
+        if (createdWithEinkTheme) {
             setTheme(R.style.ChessThemeEink);
         }
 
@@ -59,15 +62,20 @@ public class BaseActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getPrefs();
 
+        // The theme is chosen in onCreate, so an e-ink theme switched in another
+        // screen (board settings) needs this one rebuilt when it comes back.
+        EinkMode.load(prefs);
+        if (EinkMode.isThemeEnabled() != createdWithEinkTheme) {
+            recreate();
+        }
+
         if (prefs.getBoolean("wakeLock", true)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
-        // E-ink screens are small and the status bar is a permanently redrawing
-        // strip (clock, wifi, battery) in a shade the app does not control.
-        if (prefs.getBoolean("fullScreen", false) || EinkMode.isEnabled()) {
+        if (prefs.getBoolean("fullScreen", false)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);

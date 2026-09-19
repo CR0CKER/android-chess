@@ -41,6 +41,7 @@ public class StartBaseActivity extends AppCompatActivity {
     protected RecyclerView list;
     protected StartItemAdapter startItemAdapter;
     protected int layoutResource = R.layout.start;
+    private boolean createdWithEinkTheme;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,8 +50,10 @@ public class StartBaseActivity extends AppCompatActivity {
         // Before super.onCreate: AppCompat resolves theme attributes while
         // building its delegate, so a later setTheme leaves widgets styled from
         // the previous theme after a recreate().
+        EinkMode.ensureInitialised(prefs);
         EinkMode.load(prefs);
-        if (EinkMode.isEnabled()) {
+        createdWithEinkTheme = EinkMode.isThemeEnabled();
+        if (createdWithEinkTheme) {
             setTheme(R.style.ChessStartEink);
         }
 
@@ -115,5 +118,17 @@ public class StartBaseActivity extends AppCompatActivity {
         list.setAdapter(startItemAdapter);
         EinkMode.applyTo(list);
         list.requestFocus();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // The theme is chosen in onCreate, so an e-ink theme switched in board
+        // settings needs this screen rebuilt when it comes back to the front.
+        EinkMode.load(getSharedPreferences("ChessPlayer", Context.MODE_PRIVATE));
+        if (EinkMode.isThemeEnabled() != createdWithEinkTheme) {
+            recreate();
+        }
     }
 }

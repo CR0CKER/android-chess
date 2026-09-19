@@ -32,9 +32,7 @@ public class ActivityHelper {
             }
 
             SharedPreferences prefs = context.getSharedPreferences("ChessPlayer", Activity.MODE_PRIVATE);
-            // Must agree with BaseActivity, which also forces fullscreen on e-ink,
-            // or the status bar inset stays reserved as a blank strip.
-            boolean fullScreen = prefs.getBoolean("fullScreen", false) || EinkMode.isEnabled();
+            boolean fullScreen = prefs.getBoolean("fullScreen", false);
 
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             DisplayCutoutCompat cutout = insets.getDisplayCutout();
@@ -66,7 +64,7 @@ public class ActivityHelper {
     }
 
     public static void pulseAnimation(View v, float factor, int repeatCount) {
-        if (EinkMode.isEnabled()) {
+        if (EinkMode.isReduceAnimations()) {
             // A repeated grow/shrink is a continuous partial refresh on e-ink,
             // which ghosts. The view stays put instead.
             return;

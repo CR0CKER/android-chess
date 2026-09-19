@@ -8,10 +8,9 @@ public class ColorSchemes {
     public static final int CUSTOM_COLOR_SCHEME = 9;
 
     /**
-     * Greyscale scheme used by e-ink mode. Not offered in the colour scheme
-     * dropdown, so it must sit past the end of that list: the saved
-     * "colorscheme" preference is a positional index into it. Move this if a
-     * scheme is ever added after CUSTOM_COLOR_SCHEME.
+     * Greyscale scheme for e-ink screens, the last entry of the colour scheme
+     * dropdown. The saved "colorscheme" preference is a positional index into
+     * that list, so this must stay in step with the "colorschemes" array.
      */
     public static final int EINK = 10;
 

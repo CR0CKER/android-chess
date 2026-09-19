@@ -1,6 +1,6 @@
 # E-ink fork — engineering notes
 
-Last updated: 2026-09-17 02:23 PM CDT
+Last updated: 2026-09-19 03:13 AM CDT
 
 Working notes for the `eink` branch of `CR0CKER/android-chess`, a fork of
 [jcarolus/android-chess](https://github.com/jcarolus/android-chess) (MIT) adapted for
@@ -70,7 +70,7 @@ instrumentation tests**; the only tests are native C++ (`make test` in
 
 ## Design decisions
 
-**Dragging cannot be made smooth on e-ink, so it is removed.**
+**Dragging cannot be made smooth on e-ink, hence "Tap to move".**
 `View.DragShadowBuilder.onDrawShadow()` is called *once*; the bitmap goes into a surface
 owned by the system compositor, which then translates it with the finger. The app gets no
 hook to throttle that, so the panel receives a fresh dirty region at touch-sampling rate
@@ -99,33 +99,55 @@ refresh to clear accumulated ghosting. Boox's own system-wide refresh interval c
 panel-technology API. `EinkMode.isEinkHardware()` matches `Build.MANUFACTURER`/`BRAND`/
 `MODEL` against vendors whose entire line is e-ink (Onyx, Bigme, Dasung, Supernote,
 Meebook, Boyue, Moaan, PocketBook, reMarkable, InkBook). Mixed-line vendors (Hisense,
-TCL) are excluded so an LCD user is never given a greyscale board. Detection supplies
-only the *initial* default; an explicit preference always wins.
+TCL) are excluded so an LCD user is never given a greyscale board. Detection runs once,
+on the first launch (`EinkMode.ensureInitialised`, when `einkMode` has never been
+stored); after that the user's settings always win. Agreed with the maintainer in #241
+(2026-09-18) — their own device, a BOOX Go 6, is caught by it.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
 ## What e-ink mode changes
 
-Single preference `einkMode` in `SharedPreferences("ChessPlayer")`, state in
-`helpers/EinkMode.java`, loaded in `BaseActivity.onCreate`, `StartBaseActivity.onCreate`
-(both **before** `super.onCreate`) and `ChessBoardActivity.onResume`. Surfaced in **Game
-Settings** and in Board Settings.
+**Settings, plus a preset that sets them** — the model agreed with the maintainer in
+#241 (2026-09-18), replacing the earlier single mode that overrode everything. All
+preferences live in `SharedPreferences("ChessPlayer")`; the logic is in
+`helpers/EinkMode.java`.
 
-| Area | Change |
+The preset (`einkMode`; Board settings and Game settings) writes these values into the
+ordinary settings, each of which stays changeable on its own:
+
+| Key | New? | E-ink value | Default |
+|---|---|---|---|
+| `disableDrag` — Tap to move | new | on | off |
+| `einkTheme` — E-ink theme | new | on | off |
+| `reduceAnimations` — Reduce animations | new | on | off |
+| `pref_use_piece_animation` | existing | off | on |
+| `pieceset` | existing | Alpha (`"0"`) | `"0"` |
+| `colorscheme` | existing | Greyscale (`"10"`, `ColorSchemes.EINK`) | `"0"` |
+| `squarePattern` | existing | none (`"0"`) | `"0"` |
+| `fullScreen` | existing | on | off |
+| `minimal` | existing | on | off |
+
+**Switching the preset off** restores each setting's value from before
+(`einkPrevious.<key>`), **unless the setting no longer has its e-ink value** — then the
+user changed it since, and it stays. The table is `EinkMode.PRESET`; apply, revert and
+the defaults all come from it.
+
+What each new setting controls:
+
+| Setting | Effect |
 |---|---|
-| Input | Tap-to-move; no drag shadow; tapping another own piece re-selects, except a king tap along its rank (castling) |
-| Board | `ColorSchemes.EINK`, Alpha pieces, no tile pattern, no desaturation |
-| Chrome | `ChessThemeEink`/`ChessStartEink`/`ChessDialogThemeEink`, black-and-white only |
-| Buttons | Icon buttons white + black outline; text buttons black + white label; toggles invert |
-| Switches | Explicit outlined track/thumb drawables, not tints |
-| Panes | Outline (`eink_pane_border`) instead of translucent fill, via `?attr/paneBackground` |
-| Animation | No piece-move animation, no indeterminate progress bar, no pulse, no RecyclerView item animators, no ripples |
-| Text churn | Clock and engine score only `setText` on change; engine PV balloon suppressed |
-| Layout | Fullscreen (status bar hidden); minimal controls forced on |
+| Tap to move | No drag shadow; tapping another own piece re-selects, except a king tap along its rank (castling) |
+| E-ink theme | `ChessThemeEink`/`ChessStartEink`/`ChessDialogThemeEink`, black and white only; icon buttons white + black outline, text buttons black + white label, toggles invert; outlined switches and panes (`?attr/paneBackground`); no ripples; engine score unboxed; empty captured-piece slots hidden |
+| Reduce animations | No indeterminate engine progress bar, no pulse, no RecyclerView item animators, no drag-over square highlight, engine PV balloon not updated |
 
-`applyBoardAppearance()` overrides the saved colour scheme, piece set, tile pattern and
-saturation while active; the user's own choices stay in preferences and return when the
-mode is switched off.
+Always on, regardless of settings: the clock and engine score only `setText` when the
+text changes.
+
+The three flags are cached statically by `EinkMode.load`, called in
+`BaseActivity`/`StartBaseActivity` `onCreate` (**before** `super.onCreate`, see gotchas)
+and `onResume`, and in `ChessBoardActivity.onResume`. Both base activities remember the
+theme they were created with and `recreate()` in `onResume` if it has changed.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
@@ -172,9 +194,16 @@ Each of these cost at least one build cycle.
   buttons until `ChessAlertDialogThemeEink` was added.
 - **Minimal mode moved the menu button.** `TextViewLastMove` is the stretched column
   (`stretchColumns="2"`); setting it `GONE` collapses the row. Use `INVISIBLE`.
+- **A screen's `onPause` saves its controls — including during `recreate()`.** Applying
+  the preset and then recreating let `onPause` write the *old* control values back over
+  it. `BoardPreferencesActivity` saves first, applies, reloads its controls, then
+  recreates; `PlayActivity` sets `switchMinimal` from prefs before recreating.
+- **Python's `read_text()`/`write_text()` normalise CRLF to LF** and so rewrite whole
+  CRLF files (`GamesListActivity.java` is *mixed*: 656 of 660 lines CRLF). Edit those
+  with `sed`, or read and write bytes.
 - **Preferences reset on install on this device**, so a fresh install came up in the
   colour theme. Two "the buttons are still black" reports turned out to be the *stock*
-  blue theme on greyscale, not a defect — always confirm `einkMode` before trusting a
+  blue theme on greyscale, not a defect — always confirm `einkTheme` before trusting a
   visual bug report.
 
 <sub>[↑ Back to contents](#contents)</sub>
@@ -224,6 +253,12 @@ first.
   seven call sites with no local test capability.
 - Screens never exercised in e-ink mode: Lichess (including the Swiss/Teams screens added
   in 10.4.0, whose loading spinners are still indeterminate), ICS, hotspot board, PGN tools.
+- **Settings-plus-preset rework (2026-09-19) is CI-built only**, not yet device-tested.
+  Checklist: fresh install (uninstall first — an old install has `einkMode=true` but none
+  of the new keys, so it comes up in colour; switching e-ink off and on once fixes it)
+  comes up in e-ink; change the piece set, switch e-ink off → piece set stays, the rest
+  reverts; switch on again; re-enable dragging with e-ink on; toggle from Game settings →
+  play screen restyles and minimal follows; normal play, undo, flip, castling with dots off.
 - **Rebased onto upstream 10.4.0 and device-tested on the Poke3, 2026-09-17** — normal play
   is good. Not individually confirmed yet: Chess960 castling with "Show moves" off, and the
   Lichess Swiss/Teams screens added in 10.4.0.

@@ -23,7 +23,7 @@ public class PGNDialog extends Dialog {
     private static final String TAG = "PGNDialog";
 
     public PGNDialog(@NonNull final Context context, final GameApi gameApi) {
-        super(context, EinkMode.isEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
+        super(context, EinkMode.isThemeEnabled() ? R.style.ChessDialogThemeEink : R.style.ChessDialogTheme);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 

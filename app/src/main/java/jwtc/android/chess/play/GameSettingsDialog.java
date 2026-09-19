@@ -25,6 +25,9 @@ import jwtc.android.chess.helpers.ResultDialogListener;
 import jwtc.android.chess.views.FixedDropdownView;
 
 public class GameSettingsDialog extends ResultDialog<Bundle> {
+    /** Result flag: the e-ink preset was switched, so the caller must restyle. */
+    public static final String EINK_PRESET_CHANGED = "einkPresetChanged";
+
     public GameSettingsDialog(@NonNull Context context, ResultDialogListener<Bundle> listener, int requestCode, final SharedPreferences prefs, boolean isDuckGame) {
         super(context, listener, requestCode);
 
@@ -51,7 +54,7 @@ public class GameSettingsDialog extends ResultDialog<Bundle> {
         spinnerLevelTime.setItems(context.getResources().getStringArray(R.array.levels_time));
         spinnerLevelPly.setItems(context.getResources().getStringArray(R.array.levels_ply));
 
-        toggleEinkMode.setChecked(EinkMode.isEnabled());
+        toggleEinkMode.setChecked(prefs.getBoolean(EinkMode.PREF_KEY, false));
 
         toggleQuiescent.setChecked(quiescentSearchOn);
         toggleQuiescent.setText(quiescentSearchOn
@@ -158,11 +161,22 @@ public class GameSettingsDialog extends ResultDialog<Bundle> {
                 editor.putInt("levelPly", spinnerLevelPly.getSelectedItemPosition() + 1);
 
                 editor.putBoolean("quiescentSearchOn", toggleQuiescent.isChecked());
-                editor.putBoolean(EinkMode.PREF_KEY, toggleEinkMode.isChecked());
-
                 editor.commit();
 
-                setResult(new Bundle());
+                // The preset writes several settings and remembers the old ones,
+                // so it goes through EinkMode rather than a bare putBoolean.
+                final boolean einkChanged = toggleEinkMode.isChecked() != prefs.getBoolean(EinkMode.PREF_KEY, false);
+                if (einkChanged) {
+                    if (toggleEinkMode.isChecked()) {
+                        EinkMode.applyPreset(prefs);
+                    } else {
+                        EinkMode.revertPreset(prefs);
+                    }
+                }
+
+                Bundle result = new Bundle();
+                result.putBoolean(EINK_PRESET_CHANGED, einkChanged);
+                setResult(result);
 
                 dismiss();
             }

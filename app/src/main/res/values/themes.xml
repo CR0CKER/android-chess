@@ -70,8 +70,8 @@
     </style>
 
     <!--
-        E-ink mode. Applied on top of ChessTheme / ChessStart via setTheme() when
-        the einkMode preference is on.
+        E-ink theme. Applied on top of ChessTheme / ChessStart via setTheme() when
+        the einkTheme preference is on.
 
         Everything is pure black on white: reflective panels have no backlight, so
         mid-tone accents lose most of their contrast, and the saturated blues and
