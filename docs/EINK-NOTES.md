@@ -114,7 +114,7 @@ stored); after that the user's settings always win. Agreed with the maintainer i
 preferences live in `SharedPreferences("ChessPlayer")`; the logic is in
 `helpers/EinkMode.java`.
 
-The preset (`einkMode`; Board settings and Game settings) writes these values into the
+The preset (`einkMode`, in Board settings only) writes these values into the
 ordinary settings, each of which stays changeable on its own:
 
 | Key | New? | E-ink value | Default |
@@ -198,7 +198,9 @@ Each of these cost at least one build cycle.
 - **A screen's `onPause` saves its controls — including during `recreate()`.** Applying
   the preset and then recreating let `onPause` write the *old* control values back over
   it. `BoardPreferencesActivity` saves first, applies, reloads its controls, then
-  recreates; `PlayActivity` sets `switchMinimal` from prefs before recreating.
+  recreates. The preset used to be in Game settings too; it was removed (2026-09-19) as
+  redundant, which also removed the one other place this ordering mattered
+  (`PlayActivity`'s minimal switch).
 - **Python's `read_text()`/`write_text()` normalise CRLF to LF** and so rewrite whole
   CRLF files (`GamesListActivity.java` is *mixed*: 656 of 660 lines CRLF). Edit those
   with `sed`, or read and write bytes.
@@ -265,8 +267,8 @@ first.
   Checklist: fresh install (uninstall first — an old install has `einkMode=true` but none
   of the new keys, so it comes up in colour; switching e-ink off and on once fixes it)
   comes up in e-ink; change the piece set, switch e-ink off → piece set stays, the rest
-  reverts; switch on again; re-enable dragging with e-ink on; toggle from Game settings →
-  play screen restyles and minimal follows; normal play, undo, flip, castling with dots off.
+  reverts; switch on again; re-enable dragging with e-ink on; back in the play screen after
+  switching → it restyles and minimal controls follow; normal play, undo, flip, castling with dots off.
 - **Rebased onto upstream 10.4.0 and device-tested on the Poke3, 2026-09-17** — normal play
   is good. Not individually confirmed yet: Chess960 castling with "Show moves" off, and the
   Lichess Swiss/Teams screens added in 10.4.0.

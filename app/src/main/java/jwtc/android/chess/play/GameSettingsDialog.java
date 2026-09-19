@@ -19,15 +19,11 @@ import jwtc.android.chess.R;
 import jwtc.android.chess.engine.EngineApi;
 import jwtc.android.chess.engine.oex.OexEngineDescriptor;
 import jwtc.android.chess.engine.oex.OexEngineResolver;
-import jwtc.android.chess.helpers.EinkMode;
 import jwtc.android.chess.helpers.ResultDialog;
 import jwtc.android.chess.helpers.ResultDialogListener;
 import jwtc.android.chess.views.FixedDropdownView;
 
 public class GameSettingsDialog extends ResultDialog<Bundle> {
-    /** Result flag: the e-ink preset was switched, so the caller must restyle. */
-    public static final String EINK_PRESET_CHANGED = "einkPresetChanged";
-
     public GameSettingsDialog(@NonNull Context context, ResultDialogListener<Bundle> listener, int requestCode, final SharedPreferences prefs, boolean isDuckGame) {
         super(context, listener, requestCode);
 
@@ -48,13 +44,10 @@ public class GameSettingsDialog extends ResultDialog<Bundle> {
         final FixedDropdownView spinnerLevelTime = findViewById(R.id.SpinnerOptionsLevelTime);
         final FixedDropdownView spinnerLevelPly = findViewById(R.id.SpinnerOptionsLevelPly);
         final SwitchMaterial toggleQuiescent = findViewById(R.id.ToggleQuiescent);
-        final SwitchMaterial toggleEinkMode = findViewById(R.id.ToggleEinkMode);
         final TextView textEngineBackendHint = findViewById(R.id.TextViewEngineBackendHint);
 
         spinnerLevelTime.setItems(context.getResources().getStringArray(R.array.levels_time));
         spinnerLevelPly.setItems(context.getResources().getStringArray(R.array.levels_ply));
-
-        toggleEinkMode.setChecked(prefs.getBoolean(EinkMode.PREF_KEY, false));
 
         toggleQuiescent.setChecked(quiescentSearchOn);
         toggleQuiescent.setText(quiescentSearchOn
@@ -161,22 +154,10 @@ public class GameSettingsDialog extends ResultDialog<Bundle> {
                 editor.putInt("levelPly", spinnerLevelPly.getSelectedItemPosition() + 1);
 
                 editor.putBoolean("quiescentSearchOn", toggleQuiescent.isChecked());
+
                 editor.commit();
 
-                // The preset writes several settings and remembers the old ones,
-                // so it goes through EinkMode rather than a bare putBoolean.
-                final boolean einkChanged = toggleEinkMode.isChecked() != prefs.getBoolean(EinkMode.PREF_KEY, false);
-                if (einkChanged) {
-                    if (toggleEinkMode.isChecked()) {
-                        EinkMode.applyPreset(prefs);
-                    } else {
-                        EinkMode.revertPreset(prefs);
-                    }
-                }
-
-                Bundle result = new Bundle();
-                result.putBoolean(EINK_PRESET_CHANGED, einkChanged);
-                setResult(result);
+                setResult(new Bundle());
 
                 dismiss();
             }

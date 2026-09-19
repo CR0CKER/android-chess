@@ -817,15 +817,6 @@ public class PlayActivity extends ChessBoardActivity implements
                 break;
 
             case REQUEST_GAME_SETTINGS:
-                if (data != null && data.getBoolean(GameSettingsDialog.EINK_PRESET_CHANGED, false)) {
-                    // The preset may change the theme, which is chosen in onCreate,
-                    // so this needs a fresh activity rather than just a redraw.
-                    // onPause writes "minimal" from the switch, so bring the switch
-                    // in line with the preset first or the old value wins.
-                    switchMinimal.setChecked(getPrefs().getBoolean("minimal", false));
-                    recreate();
-                    return;
-                }
                 updateGameSettingsByPrefs();
                 updateGUI();
                 playIfEngineMove();

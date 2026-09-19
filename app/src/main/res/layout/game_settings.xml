@@ -138,14 +138,6 @@
                     android:layout_margin="4dip"
                     android:checked="true"
                     android:text="@string/options_quiescent_on" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/ToggleEinkMode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="4dip"
-                    android:checked="false"
-                    android:text="@string/pref_eink_mode" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
